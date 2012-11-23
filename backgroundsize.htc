@@ -47,7 +47,6 @@ function init() {
 	element.bgsExpando = expando = {
 		wrapper: wrapper,
 		img: img,
-		display: element.currentStyle.display,
 		backgroundSize: element.currentStyle['background-size'],
 		// Only keywords or percentage values are supported
 		backgroundPositionX: positions[ pos[0] ] || parseFloat( pos[0] ) / 100,
@@ -63,15 +62,26 @@ function init() {
 		element.style.position = "relative";
 	}
 
-	if ( expando.display != "none" ) {
-		refreshBackgroundDimensions( element, expando );
-		refreshBackgroundImage( element, expando );
-		// the backround is automatically updated once the image has been refreshed
-		// updateBackground( element, expando );
+	if ( refreshDisplay( element, expando ) ) {
+		refreshDimensions( element, expando );
+		refreshBackgroundImage( element, expando, function() {
+			updateBackground( element, expando );
+		});
 	}
 }
 
-function refreshBackgroundDimensions( element, expando, update ) {
+function refreshDisplay( element, expando ) {
+	var display = element.currentStyle.display;
+
+	if ( display != expando.display ) {
+		expando.display = display;
+		expando.somethingChanged = true;
+	}
+
+	return display != "none";
+}
+
+function refreshDimensions( element, expando ) {
 	var innerWidth = element.offsetWidth
 			- ( parseFloat( element.currentStyle.borderLeftWidth ) || 0 )
 			- ( parseFloat( element.currentStyle.borderRightWidth ) || 0 ),
@@ -82,19 +92,17 @@ function refreshBackgroundDimensions( element, expando, update ) {
 	if ( innerWidth != expando.innerWidth || innerHeight != expando.innerHeight ) {
 		expando.innerWidth = innerWidth;
 		expando.innerHeight = innerHeight;
-
-		if ( update ) {
-			updateBackground( element, expando );
-		}
+		expando.somethingChanged = true;
 	}
 }
 
-function refreshBackgroundImage( element, expando, update ) {
+function refreshBackgroundImage( element, expando, callback ) {
 	var img = expando.img,
 		src = ( rsrc.exec( element.currentStyle.backgroundImage ) || [] )[1];
 
 	if ( src && src != expando.backgroundSrc ) {
 		expando.backgroundSrc = src;
+		expando.somethingChanged = true;
 
 		img.onload = function() {
 			var width = img.width,
@@ -107,7 +115,7 @@ function refreshBackgroundImage( element, expando, update ) {
 			expando.imgHeight = height;
 			expando.constrain = false;
 
-			updateBackground( element, expando );
+			callback();
 
 			img.style.visibility = "visible";
 			img.onload = null;
@@ -126,12 +134,14 @@ function refreshBackgroundImage( element, expando, update ) {
 		element.style.backgroundImage = "none";
 	
 	} else {
-		// the background should be updated in all cases
-		updateBackground( element, expando );
+		// the callback should be exacuted in all cases
+		callback();
 	}
 }
 
 function updateBackground( element, expando ) {
+	if ( !expando.somethingChanged ) { return; }
+
 	var img = expando.img,
 		elemRatio = expando.innerWidth / expando.innerHeight,
 		imgRatio = expando.imgWidth / expando.imgHeight,
@@ -213,6 +223,8 @@ function updateBackground( element, expando ) {
 			}
 		}
 	}
+
+	expando.somethingChanged = false;
 }
 
 // handle different style changes
@@ -226,13 +238,11 @@ function handlePropertychange() {
 		return;
 	}
 
-	expando.display = element.currentStyle.display;
-
-	if ( expando.display != "none" ) {
-		refreshBackgroundDimensions( element, expando );
-		refreshBackgroundImage( element, expando );
-		// the backround is automatically updated once the image has been refreshed
-		// updateBackground( element, expando );
+	if ( refreshDisplay( element, expando ) ) {
+		refreshDimensions( element, expando );
+		refreshBackgroundImage( element, expando, function() {
+			updateBackground( element, expando );
+		});
 	}
 }
 
@@ -242,9 +252,8 @@ function handleResize() {
 	var expando = element.bgsExpando;
 
 	if ( expando.display != "none" ) {
-		refreshBackgroundDimensions( element, expando, true );
-		// the backround is automatically updated if the dimensions of the element have changed
-		// updateBackground( element, expando );
+		refreshDimensions( element, expando );
+		updateBackground( element, expando );
 	}
 }
 

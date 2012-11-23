@@ -6,14 +6,13 @@
 body {
 	margin: 0;
 	background: url(images/algeria.jpg) center no-repeat;
+	-ms-behavior: url(backgroundsize.min.htc);
 }
 .bgsCover {
 	background-size: cover;
-	-ms-behavior: url(backgroundsize.htc);
 }
 .bgsContain {
 	background-size: contain;
-	-ms-behavior: url(backgroundsize.htc);
 }
 /* this allows to use a second background in all browsers and IE8 */
 body:after {
@@ -45,7 +44,7 @@ body:after {
 	background-position: center;
 	background-repeat: no-repeat;
 	background-size: contain;
-	-ms-behavior: url(backgroundsize.htc);
+	-ms-behavior: url(backgroundsize.min.htc);
 }
 #carousel .active {
 	display: block;

@@ -1,0 +1,123 @@
+<!doctype html>
+<html>
+<head>
+<style>
+/* set the background of the body */
+body {
+	margin: 0;
+	background: url(images/algeria.jpg) center no-repeat;
+}
+.bgsCover {
+	background-size: cover;
+	-ms-behavior: url(backgroundsize.htc);
+}
+.bgsContain {
+	background-size: contain;
+	-ms-behavior: url(backgroundsize.htc);
+}
+/* this allows to use a second background in all browsers and IE8 */
+body:after {
+  content: "";
+  background: url(images/pattern.png) repeat;
+  position: absolute;
+  z-index: -1;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
+
+/* responsive carousel FTW */
+#carousel {
+	height: 50%;
+	width: 50%;
+	margin: 0 auto;
+}
+#carousel ul {
+	height: 100%;
+	padding: 0;
+	list-style: none;
+}
+#carousel li {
+	display: none;
+	height: 100%;
+
+	background-position: center;
+	background-repeat: no-repeat;
+	background-size: contain;
+	-ms-behavior: url(backgroundsize.htc);
+}
+#carousel .active {
+	display: block;
+}
+
+/* less interesting stuff below */
+html, body {
+	height: 100%;
+	font-family: "Arial", "Liberation Sans", sans-serif;
+	color: #FEE;
+}
+
+h1 {
+	font-family: "Arial Narrow", "Liberation Sans Narrow", sans-serif;
+	font-weight: normal;
+	font-size: 2.2em;
+	text-align: center;
+	margin-top: 0;
+	padding: 1em 0;
+}
+h1 a {
+	cursor: pointer;
+	text-decoration: underline;
+}
+</style>
+</head>
+<body class="bgsCover">
+
+<h1><a id="switchImage">BACKGROUND</a>-<a id="switchSize">SIZE</a></h1>
+
+<div id="carousel">
+	<ul>
+		<li id="img1" class="active" style="background-image: url(images/algerian1.jpg);">
+		<li id="img2" style="background-image: url(images/jar1.jpg);">
+		<li id="img3" style="background-image: url(images/algerian2.jpg);">
+		<li id="img4" style="background-image: url(images/jar2.jpg);">
+	</ul>
+</div>
+
+<script>
+
+var images = [
+		'algeria.jpg',
+		'parthenon.jpg',
+		'propylaea.jpg'
+	],
+	curImg = 0;
+document.getElementById("switchImage").onclick = function() {
+	curImg = ( curImg + 1 ) % images.length;
+	document.body.style.backgroundImage = "url(images/" + images[ curImg ] + ")";
+};
+
+var sizes = [
+		"Cover",
+		"Contain",
+		"Auto"
+	],
+	curSize = 0;
+document.getElementById("switchSize").onclick = function() {
+	curSize = ( curSize + 1 ) % sizes.length;
+	document.body.className = "bgs" + sizes[ curSize ];
+};
+
+var items = document.querySelectorAll("#carousel li"),
+	curItem = 0;
+setInterval(function() {
+	items[ curItem ].className = "";
+
+	curItem = ( curItem + 1 ) % items.length;
+	items[ curItem ].className = "active";
+}, 3000);
+
+</script>
+</body>
+</html>

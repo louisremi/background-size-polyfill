@@ -1,6 +1,7 @@
 <!doctype html>
 <html>
 <head>
+<link href='http://fonts.googleapis.com/css?family=Great+Vibes' rel='stylesheet' type='text/css'>
 <style>
 /* set the background of the body */
 body {
@@ -28,13 +29,16 @@ body:after {
 
 /* responsive carousel FTW */
 #carousel {
-	height: 50%;
+	height: 45%;
 	width: 50%;
 	margin: 0 auto;
+	background: #0F0808;
+	border-radius: 3px;
 }
 #carousel ul {
 	height: 100%;
 	padding: 0;
+	margin: 0;
 	list-style: none;
 }
 #carousel li {
@@ -58,22 +62,48 @@ html, body {
 }
 
 h1 {
-	font-family: "Arial Narrow", "Liberation Sans Narrow", sans-serif;
-	font-weight: normal;
-	font-size: 2.2em;
+	font-family: 'Great Vibes', sans-serif;
 	text-align: center;
-	margin-top: 0;
-	padding: 1em 0;
+	margin: 0 0 40px;
+	text-shadow: 0 0 2px #222;
+	font-size: 1.7em;
+	font-weight: normal;
+	position: relative;
+	top: 20px;
 }
-h1 a {
-	cursor: pointer;
-	text-decoration: underline;
+
+h1 i {
+	font-size: 1.3em;
+	display: block;
+	-moz-transform: rotate(-15deg);
+	-webkit-transform: rotate(-15deg);
+	-o-transform: rotate(-15deg);
+	-ms-transform: rotate(-15deg);
+	transform: rotate(-15deg);
+}
+
+p {
+	text-align: center;
+	font-size: 1.5em;
+
+	text-shadow: 0 0 2px #222;
+}
+
+.button {
+	color: #0F0808;
+	text-decoration: none;
+	background: #FEE;
+	border-radius: 3px;
+	text-shadow: none;
+	padding: 4px 8px;
 }
 </style>
 </head>
 <body class="bgsCover">
 
-<h1><a id="switchImage">BACKGROUND</a>-<a id="switchSize">SIZE</a></h1>
+<h1><i>background-size</i> polyfill</h1>
+
+<a href="https://github.com/louisremi/background-size-polyfill"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_white_ffffff.png" alt="Fork me on GitHub"></a>
 
 <div id="carousel">
 	<ul>
@@ -84,9 +114,12 @@ h1 a {
 	</ul>
 </div>
 
+<p>Bringing <code>background-size: cover;</code> and <code>background-size: contain;</code> to IE8.<br/>
+Reacts to resize events for responsive backgrounds and galeries!</p>
+<p><a class="button" href="https://github.com/louisremi/background-size-polyfill#readme">Instructions</a> - <a class="button" href="https://github.com/louisremi/background-size-polyfill/downloads">Downloads</a></p>
 <script>
 
-var images = [
+/*var images = [
 		'algeria.jpg',
 		'parthenon.jpg',
 		'propylaea.jpg'
@@ -106,7 +139,7 @@ var sizes = [
 document.getElementById("switchSize").onclick = function() {
 	curSize = ( curSize + 1 ) % sizes.length;
 	document.body.className = "bgs" + sizes[ curSize ];
-};
+};*/
 
 var items = document.querySelectorAll("#carousel li"),
 	curItem = 0;

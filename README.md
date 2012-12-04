@@ -1,5 +1,5 @@
-backgrouund-size polyfill
-=========================
+background-size polyfill
+========================
 
 An IE behavior adding support for `background-size: cover;` and `background-size: contain;` to IE8.
 
@@ -20,7 +20,7 @@ Unfortunately, they don't degrade gracefully: websites would likely appear broke
 How to use it?
 -----------------
 
-Everywhere you use `background-size: cover;` or `background-size: contain;` in your CSS, add a reference to this script.
+Everywhere you use `background-size: cover;` or `background-size: contain;` in your CSS, add a reference to this file.
 
 ```css
 .selector { 
@@ -28,7 +28,7 @@ Everywhere you use `background-size: cover;` or `background-size: contain;` in y
 	-ms-behavior: url(http://louisremi.github.com/background-size-polyfill/backgroundsize.min.htc);
 }
 ```
-The elements targeted by this plugin should have a `position: relative;` or `position: fixed;` and a z-index. 
+The elements targeted this way should have a `position: relative;` or `position: fixed;` and a z-index. 
 If not, they will be given a `position: relative;` and `z-index: 0;`.
 
 Limitations
@@ -60,9 +60,10 @@ Self-hosting
 ------------
 
 When deploying this solution on production environment, you should switch to a self-hosted version of the file.
-You will need to configure your server to send appropriate `text/x-component` headers along with it.  
-With Apache you can do this by adding the following line to an .htaccess file: `AddType text/x-component .htc`.  
-With NodeJS you can use the node-mime module which already recognizes that extension.  
+You will need to configure your server to send appropriate `text/x-component` headers along with it.
+
+- Apache: add the following line to an .htaccess file: `AddType text/x-component .htc`
+- Node: the node-mime module already recognizes that extension
 
 License
 -----------------

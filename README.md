@@ -18,17 +18,21 @@ Unfortunately, they don't degrade gracefully: websites would likely appear broke
 ...unless you use this behavior!
 
 How to use it?
------------------
+--------------
+
+Upload `backgroundsize.min.htc` to your website, along with the `.htaccess` that will send the mime-type required by IE (Apache only — it's built in nginx, node and IIS).
 
 Everywhere you use `background-size: cover;` or `background-size: contain;` in your CSS, add a reference to this file.
 
 ```css
 .selector { 
 	background-size: cover;
-	-ms-behavior: url(http://louisremi.github.com/background-size-polyfill/backgroundsize.min.htc);
+	/* The url is relative to the document, not to the css file! */
+	/* Prefer absolute urls to avoid confusion. */
+	-ms-behavior: url(/backgroundsize.min.htc);
 }
 ```
-The elements targeted this way should have a `position: relative;` or `position: fixed;` and a z-index. 
+The elements styled this way should have a `position: relative;` or `position: fixed;` and a z-index. 
 If not, they will be given a `position: relative;` and `z-index: 0;`.
 
 Limitations
@@ -55,15 +59,6 @@ The following style properties, values or behavior aren't supported:
 - resizing the background when the dimensions of the element change
 
 Removing any of these limitations is probably just one fork away...
-
-Self-hosting
-------------
-
-When deploying this solution on production environment, you should switch to a self-hosted version of the file.
-You will need to configure your server to send appropriate `text/x-component` headers along with it.
-
-- Apache: add the following line to an .htaccess file: `AddType text/x-component .htc`
-- Node: the node-mime module already recognizes that extension
 
 License
 -----------------

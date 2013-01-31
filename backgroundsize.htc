@@ -31,6 +31,7 @@ function init() {
 	wrapper.style.bottom = 0;
 	wrapper.style.overflow = "hidden";
 
+	img.alt = "";
 	img.style.position = "absolute";
 	img.style.width = img.style.width = "auto";
 

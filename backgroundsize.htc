@@ -1,7 +1,7 @@
-<component lightWeight="true">
-<attach event="onpropertychange" onevent="handlePropertychange()" />
-<attach event="ondetach" onevent="restore()" />
-<attach event="onresize" for="window" onevent="handleResize()" />
+<public:component lightWeight="true">
+<public:attach event="onpropertychange" onevent="handlePropertychange()" />
+<public:attach event="ondetach" onevent="restore()" />
+<public:attach event="onresize" for="window" onevent="handleResize()" />
 <script type="text/javascript">
 
 var rsrc = /url\(["']?(.*?)["']?\)/,
@@ -269,3 +269,4 @@ function restore() {
 }
 
 </script>
+</public:component>

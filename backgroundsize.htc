@@ -20,8 +20,7 @@ init();
 function init() {
 	var wrapper = doc.createElement( "div" ),
 		img = doc.createElement( "img" ),
-		expando,
-		pos;
+		expando;
 
 	wrapper.style.position = "absolute";
 	wrapper.style.zIndex = -1;
@@ -47,11 +46,7 @@ function init() {
 	// save useful data for quick access
 	element.bgsExpando = expando = {
 		wrapper: wrapper,
-		img: img,
-		backgroundSize: element.currentStyle['background-size'],
-		// Only keywords or percentage values are supported
-		backgroundPositionX: positions[ pos[0] ] || parseFloat( pos[0] ) / 100,
-		backgroundPositionY: positions[ pos[1] ] || parseFloat( pos[1] ) / 100
+		img: img
 	};
 
 	// This is the part where we mess with the existing DOM
@@ -148,15 +143,33 @@ function updateBackground( element, expando ) {
 		imgRatio = expando.imgWidth / expando.imgHeight,
 		prevConstrain = expando.constrain,
 		curConstrain,
-		delta;
+		delta,
+		explicit_size,
+		pos,
+		backgroundSize,
+		backgroundPositionX,
+		backgroundPositionY;
 
-	if ( expando.backgroundSize == "contain" ) {
+	pos = [
+		element.currentStyle.backgroundPositionX,
+		element.currentStyle.backgroundPositionY
+	];
+  backgroundSize = element.currentStyle['background-size'];
+  // Only keywords or percentage values are supported
+	backgroundPositionX = positions[ pos[0] ]
+	if(typeof backgroundPositionX == "undefined")
+	  backgroundPositionX = parseFloat( pos[0] ) / 100;
+	backgroundPositionY = positions[ pos[1] ]
+	if(typeof backgroundPositionY == "undefined")
+	  backgroundPositionY = parseFloat( pos[1] ) / 100;
+
+	if ( backgroundSize == "contain" ) {
 		if ( imgRatio > elemRatio ) {
 			expando.constrain = curConstrain = "width";
 
 			delta = Math.floor(
 				( expando.innerHeight - expando.innerWidth / imgRatio )
-				* expando.backgroundPositionY
+				* backgroundPositionY
 			);
 
 			img.style.top = delta + "px";
@@ -175,7 +188,7 @@ function updateBackground( element, expando ) {
 
 			delta = Math.floor(
 				( expando.innerWidth - expando.innerHeight * imgRatio )
-				* expando.backgroundPositionX
+				* backgroundPositionX
 			);
 
 			img.style.left = delta + "px";
@@ -187,13 +200,13 @@ function updateBackground( element, expando ) {
 			}
 		}
 
-	} else if ( expando.backgroundSize == "cover" ) {
+	} else if ( backgroundSize == "cover" ) {
 		if ( imgRatio > elemRatio ) {
 			expando.constrain = curConstrain = "height";
 
 			delta = Math.floor(
 				( expando.innerHeight * imgRatio - expando.innerWidth )
-				* expando.backgroundPositionX
+				* backgroundPositionX
 			);
 
 			img.style.left = -delta + "px";
@@ -212,7 +225,7 @@ function updateBackground( element, expando ) {
 
 			delta = Math.floor(
 				( expando.innerWidth / imgRatio - expando.innerHeight )
-				* expando.backgroundPositionY
+				* backgroundPositionY
 			);
 
 			img.style.top = -delta + "px";
@@ -223,6 +236,21 @@ function updateBackground( element, expando ) {
 				img.style.left = 0;
 			}
 		}
+	} else {
+	  explicit_size = backgroundSize.split(' ');
+	  if( explicit_size.length == 1 ) explicit_size[1] = 'auto';
+	  img.style.width = explicit_size[0];
+	  img.style.height = explicit_size[1];
+		delta = Math.floor(
+			( expando.innerHeight * imgRatio - expando.innerWidth )
+			* backgroundPositionX
+		);
+		img.style.left = -delta + "px";
+		delta = Math.floor(
+			( expando.innerWidth / imgRatio - expando.innerHeight )
+			* backgroundPositionY
+		);
+		img.style.top = -delta + "px";
 	}
 
 	expando.somethingChanged = false;

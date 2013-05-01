@@ -200,7 +200,7 @@ function updateBackground( element, expando ) {
 			}
 		}
 
-	} else if ( expando.backgroundSize == "cover" ) {
+	} else if ( backgroundSize == "cover" ) {
 		if ( imgRatio > elemRatio ) {
 			expando.constrain = curConstrain = "height";
 

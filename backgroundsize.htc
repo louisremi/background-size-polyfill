@@ -150,7 +150,9 @@ function updateBackground( element, expando ) {
 		curConstrain,
 		delta;
 
-	if ( expando.backgroundSize == "contain" ) {
+	if ( isNaN( elemRatio ) || isNaN( imgRatio ) ) {
+		// do nothing
+	} else if ( expando.backgroundSize == "contain" ) {
 		if ( imgRatio > elemRatio ) {
 			expando.constrain = curConstrain = "width";
 

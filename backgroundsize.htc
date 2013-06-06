@@ -1,8 +1,10 @@
 <component lightWeight="true">
 <attach event="onpropertychange" onevent="handlePropertychange()" />
 <attach event="ondetach" onevent="restore()" />
-<attach event="onresize" for="window" onevent="handleResize()" />
+<attach event="onresize" for="window" onevent="handleResizeThrottled()" />
 <script type="text/javascript">
+
+var handleResizeThrottleInterval = 200;
 
 var rsrc = /url\(["']?(.*?)["']?\)/,
 	positions = {
@@ -246,10 +248,7 @@ function handlePropertychange() {
 		});
 	}
 }
-
 function handleResize() {
-	// TODO: throttle resize events
-
 	var expando = element.bgsExpando;
 
 	if ( expando.display != "none" ) {
@@ -257,6 +256,23 @@ function handleResize() {
 		updateBackground( element, expando );
 	}
 }
+
+//using _.debounce alrogithm (http://underscorejs.org/docs/underscore.html#section-65)
+var handleResizeThrottled = (function(interval) {
+	var timeout;
+	var result;
+	return function() {
+		var self = this;
+		var args = arguments;
+		var later = function() {
+			timeout = null;
+			result = handleResize.apply(context, args);
+		};
+		clearTimeout(timeout);
+		timeout = setTimeout(later, interval);
+		return result;
+	};
+})(handleResizeThrottleInterval);
 
 function restore() {
 	var expando = element.bgsExpando;

@@ -23,7 +23,10 @@ function init() {
 		expando,
 		pos;
 
-	wrapper.style.position = "absolute";
+	wrapper.style.position =
+		element.nodeName.toUpperCase() == "BODY" &&
+		element.currentStyle.backgroundAttachment == "fixed" ?
+			"fixed" : "absolute";
 	wrapper.style.zIndex = -1;
 	wrapper.style.top = 0;
 	wrapper.style.right = 0;

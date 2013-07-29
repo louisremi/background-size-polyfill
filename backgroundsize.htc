@@ -158,6 +158,8 @@ function updateBackground( element, expando ) {
 				( expando.innerHeight - expando.innerWidth / imgRatio )
 				* expando.backgroundPositionY
 			);
+			
+			if (isNaN(delta)) return;
 
 			img.style.top = delta + "px";
 
@@ -177,6 +179,8 @@ function updateBackground( element, expando ) {
 				( expando.innerWidth - expando.innerHeight * imgRatio )
 				* expando.backgroundPositionX
 			);
+			
+			if (isNaN(delta)) return;
 
 			img.style.left = delta + "px";
 
@@ -196,6 +200,8 @@ function updateBackground( element, expando ) {
 				* expando.backgroundPositionX
 			);
 
+			if (isNaN(delta)) return;
+
 			img.style.left = -delta + "px";
 
 			// when switching from height to width constraint,
@@ -214,6 +220,8 @@ function updateBackground( element, expando ) {
 				( expando.innerWidth / imgRatio - expando.innerHeight )
 				* expando.backgroundPositionY
 			);
+
+			if (isNaN(delta)) return;
 
 			img.style.top = -delta + "px";
 

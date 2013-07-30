@@ -50,8 +50,9 @@ function init() {
 		img: img,
 		backgroundSize: element.currentStyle['background-size'],
 		// Only keywords or percentage values are supported
-		backgroundPositionX: positions[ pos[0] ] || parseFloat( pos[0] ) / 100,
-		backgroundPositionY: positions[ pos[1] ] || parseFloat( pos[1] ) / 100
+		backgroundPositionX: (typeof  positions[ pos[0] ] == "number" ? positions[ pos[0] ] : parseFloat( pos[0] )) / 100,
+		backgroundPositionY: (typeof  positions[ pos[1] ] == "number" ? positions[ pos[1] ] : parseFloat( pos[1] )) / 100
+
 	};
 
 	// This is the part where we mess with the existing DOM

@@ -33,7 +33,7 @@ function init() {
 
 	img.alt = "";
 	img.style.position = "absolute";
-	img.style.width = img.style.width = "auto";
+	img.style.width = img.style.height = "auto";
 
 	wrapper.appendChild( img );
 

@@ -8,7 +8,7 @@
 
 var o; // and so it is
 
-(function( element ) {
+(function( element, spacerPath ) {
 
 var rsrc = /url\(["']?(.*?)["']?\)/,
 	positions = {
@@ -18,13 +18,15 @@ var rsrc = /url\(["']?(.*?)["']?\)/,
 		right: 1,
 		center: .5
 	},
-	doc = element.document;
+	doc = element.document,
+	spacer = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==",
+	noop = function() {};
 
 o = {
 	init: init,
-	handlePropertychange: handlePropertychange,
-	restore: restore,
-	handleResize: handleResize
+	handlePropertychange: noop,
+	restore: noop,
+	handleResize: noop
 };
 
 if ( element.readyState == "complete" ) {
@@ -75,9 +77,26 @@ function init() {
 		elementStyle.position = "relative";
 	}
 
-	handlePropertychange();
+	o.init = noop;
 
-	o.init = function() {};
+	img.onload = img.onerror = function() {
+		if ( img.width != 1 || img.height != 1 ) {
+			spacer = spacerPath;
+		}
+		img.onload = img.onerror = null;
+		imgStyle.visibility = "visible";
+
+		handlePropertychange();
+
+		o = {
+			init: noop,
+			handlePropertychange: handlePropertychange,
+			restore: restore,
+			handleResize: handleResize
+		};
+	}
+	imgStyle.visibility = "hidden";
+	img.src = spacer;
 }
 
 function refreshDisplay( element, expando ) {
@@ -157,7 +176,7 @@ function refreshBackgroundImage( element, expando, callback ) {
 
 		// force onload execution
 		if ( img.readyState || img.complete ) {
-			img.src = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==";
+			img.src = spacer;
 			img.src = expando.src;
 		}
 
@@ -303,7 +322,7 @@ function restore() {
 	} catch ( e ) {}
 }
 
-})( element );
+})( element, window.bgsSpacerGif );
 
 </script>
 

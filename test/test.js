@@ -1,7 +1,7 @@
 var r800x600 = /images\/algeria\.jpg$/,
 	r300x400 = /images\/jar1\.jpg$/,
-	url800x600 = "url(images/algeria.jpg)",
-	url300x400 = "url(images/jar1.jpg)";
+	url800x600 = "url(../images/algeria.jpg)",
+	url300x400 = "url(../images/jar1.jpg)";
 
 function testPolyfill( test ) {
 	$( "#bg" ).addClass( "polyfill" );
@@ -10,6 +10,9 @@ function testPolyfill( test ) {
 		start();
 	}, 100 );
 }
+
+window.bgsSpacerGif = "../spacer.gif";
+
 
 
 module( "general" );

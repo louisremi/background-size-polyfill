@@ -1,7 +1,7 @@
-<component lightWeight="true">
-<attach event="onpropertychange" onevent="o.handlePropertychange()" />
-<attach event="ondetach" onevent="o.restore()" />
-<attach event="onresize" for="window" onevent="o.handleResize()" />
+<PUBLIC:COMPONENT lightWeight="true">
+<PUBLIC:ATTACH EVENT="onpropertychange" ONEVENT="o.handlePropertychange()" />
+<PUBLIC:ATTACH EVENT="ondetach" ONEVENT="o.restore()" />
+<PUBLIC:ATTACH EVENT="onresize" FOR="window" ONEVENT="o.handleResize()" />
 <script type="text/javascript">
 
 var o;
@@ -306,3 +306,4 @@ https://github.com/lojjic/PIE/blob/master/sources/htc_markup.htc
 https://code.google.com/p/svgweb/source/browse/trunk/src/svg.htc
 -->
 <script type="text/vbscript"></script>
+</PUBLIC:COMPONENT>

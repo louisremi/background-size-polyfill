@@ -1,4 +1,7 @@
-var r800x600 = /images\/algeria\.jpg$/;
+var r800x600 = /images\/algeria\.jpg$/,
+	r300x400 = /images\/jar1\.jpg$/,
+	url800x600 = "url(images/algeria.jpg)",
+	url300x400 = "url(images/jar1.jpg)";
 
 function testPolyfill( test ) {
 	$( "#bg" ).addClass( "polyfill" );
@@ -394,12 +397,36 @@ module( "property change", {
 			.css( { width: 300, height: 300, "background-position": "50% 50%" } )
 			.addClass( "background-image-300x400 background-size-cover" );
 		stop();
-		testPolyfill();
+		testPolyfill( function() {
+			var img = $( "#bg img" );
+			equal( img.width(), 300, "verify width before test" );
+			equal( img.height(), 400, "verify height before test" );
+			deepEqual( img.position(), { left: 0, top: -50 }, "verify position before test" );
+			ok( r300x400.test( img.prop( "src" ) ), "verify img src before test" );
+		} );
 	}
 } );
+asyncTest( "background-size", function() {
+	expect( 7 );
+	$( "#bg" ).addClass( "background-size-contain" ).removeClass( "background-size-cover" );
+	testPolyfill( function() {
+		var img = $( "#bg img" );
+		equal( img.width(), 225, "correct width" );
+		equal( img.height(), 300, "correct height" );
+		deepEqual( img.position(), { left: 37, top: 0 }, "correct position" );
+	} );
+} );
+asyncTest( "background-position", function() {
+	expect( 5 );
+	$( "#bg" ).css( "background-position", "0 100%" );
+	testPolyfill( function() {
+		var img = $( "#bg img" );
+		deepEqual( img.position(), { left: 0, top: -100 }, "correct position" );
+	} );
+} );
 asyncTest( "background-image (DOM)", function() {
-	expect( 4 );
-	$( "#bg" ).css( "background-image", "url(images/algeria.jpg)" );
+	expect( 8 );
+	$( "#bg" ).css( "background-image", url800x600 );
 	testPolyfill( function() {
 		var img = $( "#bg img" );
 		equal( img.width(), 400, "correct width" );
@@ -409,7 +436,7 @@ asyncTest( "background-image (DOM)", function() {
 	} );
 } );
 asyncTest( "background-image (CSS class)", function() {
-	expect( 4 );
+	expect( 8 );
 	$( "#bg" ).addClass( "background-image-800x600" ).removeClass( "background-image-300x400" );
 	testPolyfill( function() {
 		var img = $( "#bg img" );

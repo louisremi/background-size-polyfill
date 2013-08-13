@@ -6,9 +6,11 @@ A continuation of louisremi's [background-size polyfill](https://github.com/loui
 Changes
 -------
 
+- Added support for dynamically changing position and size of the background image (partial reimplementation of louisremi#8)  
 - Fixed JS error when using `left` or `top` for `background-position` (louisremi#14)  
 - Work around IE hang on unload when the JScript portion is greater than 512 bytes  
 - Added unit tests  
+- Misc fixes and code cleanup
 
 ------------------------------------------------------------------------
 

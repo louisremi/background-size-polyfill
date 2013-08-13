@@ -3,12 +3,15 @@ var r800x600 = /images\/algeria\.jpg$/,
 	url800x600 = "url(../images/algeria.jpg)",
 	url300x400 = "url(../images/jar1.jpg)";
 
-function testPolyfill( test ) {
-	$( "#bg" ).addClass( "polyfill" );
-	setTimeout( function() {
-		( test || $.noop )();
-		start();
-	}, 100 );
+function polyfillReady( cb ) {
+	$( "#bg" )
+		.on( "readystatechange", function() {
+			if ( this.readyState == "complete" ) {
+				$( this ).off( "readystatechange" );
+				( cb || $.noop )();
+			}
+		} )
+		.addClass( "polyfill" );
 }
 
 window.bgsSpacerGif = "../spacer.gif";
@@ -30,9 +33,9 @@ asyncTest( "setup and teardown", function() {
 			width: 800,
 			height: 600
 		} )
-		.addClass( "background-size-cover polyfill" );
+		.addClass( "background-size-cover" );
 
-	setTimeout( function() {
+	polyfillReady( function() {
 		var children = div.children(),
 			first = children.first(),
 			grandchildren = first.children();
@@ -56,7 +59,7 @@ asyncTest( "setup and teardown", function() {
 
 			start();
 		}, 100 );
-	}, 100 );
+	} );
 } );
 
 
@@ -71,41 +74,45 @@ module( "cover, portrait", {
 asyncTest( "0.5x", function() {
 	expect( 3 );
 	$( "#bg" ).css( { width: 150, height: 150 } );
-	testPolyfill( function() {
+	polyfillReady( function() {
 		var img = $( "#bg img" );
 		equal( img.width(), 150, "correct width" );
 		equal( img.height(), 200, "correct height" );
 		deepEqual( img.position(), { left: 0, top: -25 }, "correct position" );
+		start();
 	} );
 } );
 asyncTest( "1x", function() {
 	expect( 3 );
 	$( "#bg" ).css( { width: 300, height: 300 } );
-	testPolyfill( function() {
+	polyfillReady( function() {
 		var img = $( "#bg img" );
 		equal( img.width(), 300, "correct width" );
 		equal( img.height(), 400, "correct height" );
 		deepEqual( img.position(), { left: 0, top: -50 }, "correct position" );
+		start();
 	} );
 } );
 asyncTest( "1.5x", function() {
 	expect( 3 );
 	$( "#bg" ).css( { width: 450, height: 450 } );
-	testPolyfill( function() {
+	polyfillReady( function() {
 		var img = $( "#bg img" );
 		equal( img.width(), 450, "correct width" );
 		equal( img.height(), 600, "correct height" );
 		deepEqual( img.position(), { left: 0, top: -75 }, "correct position" );
+		start();
 	} );
 } );
 asyncTest( "2x", function() {
 	expect( 3 );
 	$( "#bg" ).css( { width: 600, height: 600 } );
-	testPolyfill( function() {
+	polyfillReady( function() {
 		var img = $( "#bg img" );
 		equal( img.width(), 600, "correct width" );
 		equal( img.height(), 800, "correct height" );
 		deepEqual( img.position(), { left: 0, top: -100 }, "correct position" );
+		start();
 	} );
 } );
 
@@ -121,41 +128,45 @@ module( "cover, landscape", {
 asyncTest( "0.5x", function() {
 	expect( 3 );
 	$( "#bg" ).css( { width: 300, height: 300 } );
-	testPolyfill( function() {
+	polyfillReady( function() {
 		var img = $( "#bg img" );
 		equal( img.width(), 400, "correct width" );
 		equal( img.height(), 300, "correct height" );
 		deepEqual( img.position(), { left: -50, top: 0 }, "correct position" );
+		start();
 	} );
 } );
 asyncTest( "1x", function() {
 	expect( 3 );
 	$( "#bg" ).css( { width: 600, height: 600 } );
-	testPolyfill( function() {
+	polyfillReady( function() {
 		var img = $( "#bg img" );
 		equal( img.width(), 800, "correct width" );
 		equal( img.height(), 600, "correct height" );
 		deepEqual( img.position(), { left: -100, top: 0 }, "correct position" );
+		start();
 	} );
 } );
 asyncTest( "1.5x", function() {
 	expect( 3 );
 	$( "#bg" ).css( { width: 900, height: 900 } );
-	testPolyfill( function() {
+	polyfillReady( function() {
 		var img = $( "#bg img" );
 		equal( img.width(), 1200, "correct width" );
 		equal( img.height(), 900, "correct height" );
 		deepEqual( img.position(), { left: -150, top: 0 }, "correct position" );
+		start();
 	} );
 } );
 asyncTest( "2x", function() {
 	expect( 3 );
 	$( "#bg" ).css( { width: 1200, height: 1200 } );
-	testPolyfill( function() {
+	polyfillReady( function() {
 		var img = $( "#bg img" );
 		equal( img.width(), 1600, "correct width" );
 		equal( img.height(), 1200, "correct height" );
 		deepEqual( img.position(), { left: -200, top: 0 }, "correct position" );
+		start();
 	} );
 } );
 
@@ -171,41 +182,45 @@ module( "contain, portrait", {
 asyncTest( "0.5x", function() {
 	expect( 3 );
 	$( "#bg" ).css( { width: 200, height: 200 } );
-	testPolyfill( function() {
+	polyfillReady( function() {
 		var img = $( "#bg img" );
 		equal( img.width(), 150, "correct width" );
 		equal( img.height(), 200, "correct height" );
 		deepEqual( img.position(), { left: 25, top: 0 }, "correct position" );
+		start();
 	} );
 } );
 asyncTest( "1x", function() {
 	expect( 3 );
 	$( "#bg" ).css( { width: 400, height: 400 } );
-	testPolyfill( function() {
+	polyfillReady( function() {
 		var img = $( "#bg img" );
 		equal( img.width(), 300, "correct width" );
 		equal( img.height(), 400, "correct height" );
 		deepEqual( img.position(), { left: 50, top: 0 }, "correct position" );
+		start();
 	} );
 } );
 asyncTest( "1.5x", function() {
 	expect( 3 );
 	$( "#bg" ).css( { width: 600, height: 600 } );
-	testPolyfill( function() {
+	polyfillReady( function() {
 		var img = $( "#bg img" );
 		equal( img.width(), 450, "correct width" );
 		equal( img.height(), 600, "correct height" );
 		deepEqual( img.position(), { left: 75, top: 0 }, "correct position" );
+		start();
 	} );
 } );
 asyncTest( "2x", function() {
 	expect( 3 );
 	$( "#bg" ).css( { width: 800, height: 800 } );
-	testPolyfill( function() {
+	polyfillReady( function() {
 		var img = $( "#bg img" );
 		equal( img.width(), 600, "correct width" );
 		equal( img.height(), 800, "correct height" );
 		deepEqual( img.position(), { left: 100, top: 0 }, "correct position" );
+		start();
 	} );
 } );
 
@@ -221,41 +236,45 @@ module( "contain, landscape", {
 asyncTest( "0.5x", function() {
 	expect( 3 );
 	$( "#bg" ).css( { width: 400, height: 400 } );
-	testPolyfill( function() {
+	polyfillReady( function() {
 		var img = $( "#bg img" );
 		equal( img.width(), 400, "correct width" );
 		equal( img.height(), 300, "correct height" );
 		deepEqual( img.position(), { left: 0, top: 50 }, "correct position" );
+		start();
 	} );
 } );
 asyncTest( "1x", function() {
 	expect( 3 );
 	$( "#bg" ).css( { width: 800, height: 800 } );
-	testPolyfill( function() {
+	polyfillReady( function() {
 		var img = $( "#bg img" );
 		equal( img.width(), 800, "correct width" );
 		equal( img.height(), 600, "correct height" );
 		deepEqual( img.position(), { left: 0, top: 100 }, "correct position" );
+		start();
 	} );
 } );
 asyncTest( "1.5x", function() {
 	expect( 3 );
 	$( "#bg" ).css( { width: 1200, height: 1200 } );
-	testPolyfill( function() {
+	polyfillReady( function() {
 		var img = $( "#bg img" );
 		equal( img.width(), 1200, "correct width" );
 		equal( img.height(), 900, "correct height" );
 		deepEqual( img.position(), { left: 0, top: 150 }, "correct position" );
+		start();
 	} );
 } );
 asyncTest( "2x", function() {
 	expect( 3 );
 	$( "#bg" ).css( { width: 1600, height: 1600 } );
-	testPolyfill( function() {
+	polyfillReady( function() {
 		var img = $( "#bg img" );
 		equal( img.width(), 1600, "correct width" );
 		equal( img.height(), 1200, "correct height" );
 		deepEqual( img.position(), { left: 0, top: 200 }, "correct position" );
+		start();
 	} );
 } );
 
@@ -271,36 +290,41 @@ module( "position, percent, horizontal", {
 asyncTest( "0", function() {
 	expect( 1 );
 	$( "#bg" ).css( "background-position", "0 100%" );
-	testPolyfill( function() {
+	polyfillReady( function() {
 		deepEqual( $( "#bg img" ).position(), { left: 0, top: 0 }, "correct position" );
+		start();
 	} );
 } );
 asyncTest( "25%", function() {
 	expect( 1 );
 	$( "#bg" ).css( "background-position", "25% 100%" );
-	testPolyfill( function() {
+	polyfillReady( function() {
 		deepEqual( $( "#bg img" ).position(), { left: -50, top: 0 }, "correct position" );
+		start();
 	} );
 } );
 asyncTest( "50%", function() {
 	expect( 1 );
 	$( "#bg" ).css( "background-position", "50% 100%" );
-	testPolyfill( function() {
+	polyfillReady( function() {
 		deepEqual( $( "#bg img" ).position(), { left: -100, top: 0 }, "correct position" );
+		start();
 	} );
 } );
 asyncTest( "75%", function() {
 	expect( 1 );
 	$( "#bg" ).css( "background-position", "75% 100%" );
-	testPolyfill( function() {
+	polyfillReady( function() {
 		deepEqual( $( "#bg img" ).position(), { left: -150, top: 0 }, "correct position" );
+		start();
 	} );
 } );
 asyncTest( "100%", function() {
 	expect( 1 );
 	$( "#bg" ).css( "background-position", "100% 0" );
-	testPolyfill( function() {
+	polyfillReady( function() {
 		deepEqual( $( "#bg img" ).position(), { left: -200, top: 0 }, "correct position" );
+		start();
 	} );
 } );
 
@@ -316,36 +340,41 @@ module( "position, percent, vertical", {
 asyncTest( "0", function() {
 	expect( 1 );
 	$( "#bg" ).css( "background-position", "100% 0" );
-	testPolyfill( function() {
+	polyfillReady( function() {
 		deepEqual( $( "#bg img" ).position(), { left: 0, top: 0 }, "correct position" );
+		start();
 	} );
 } );
 asyncTest( "25%", function() {
 	expect( 1 );
 	$( "#bg" ).css( "background-position", "100% 25%" );
-	testPolyfill( function() {
+	polyfillReady( function() {
 		deepEqual( $( "#bg img" ).position(), { left: 0, top: 50 }, "correct position" );
+		start();
 	} );
 } );
 asyncTest( "50%", function() {
 	expect( 1 );
 	$( "#bg" ).css( "background-position", "100% 50%" );
-	testPolyfill( function() {
+	polyfillReady( function() {
 		deepEqual( $( "#bg img" ).position(), { left: 0, top: 100 }, "correct position" );
+		start();
 	} );
 } );
 asyncTest( "75%", function() {
 	expect( 1 );
 	$( "#bg" ).css( "background-position", "100% 75%" );
-	testPolyfill( function() {
+	polyfillReady( function() {
 		deepEqual( $( "#bg img" ).position(), { left: 0, top: 150 }, "correct position" );
+		start();
 	} );
 } );
 asyncTest( "100%", function() {
 	expect( 1 );
 	$( "#bg" ).css( "background-position", "0 100%" );
-	testPolyfill( function() {
+	polyfillReady( function() {
 		deepEqual( $( "#bg img" ).position(), { left: 0, top: 200 }, "correct position" );
+		start();
 	} );
 } );
 
@@ -361,22 +390,25 @@ module( "position, keyword, horizontal", {
 asyncTest( "left", function() {
 	expect( 1 );
 	$( "#bg" ).css( "background-position", "left 100%" );
-	testPolyfill( function() {
+	polyfillReady( function() {
 		deepEqual( $( "#bg img" ).position(), { left: 0, top: 0 }, "correct position" );
+		start();
 	} );
 } );
 asyncTest( "center", function() {
 	expect( 1 );
 	$( "#bg" ).css( "background-position", "center 100%" );
-	testPolyfill( function() {
+	polyfillReady( function() {
 		deepEqual( $( "#bg img" ).position(), { left: -100, top: 0 }, "correct position" );
+		start();
 	} );
 } );
 asyncTest( "right", function() {
 	expect( 1 );
 	$( "#bg" ).css( "background-position", "right 0" );
-	testPolyfill( function() {
+	polyfillReady( function() {
 		deepEqual( $( "#bg img" ).position(), { left: -200, top: 0 }, "correct position" );
+		start();
 	} );
 } );
 
@@ -392,22 +424,25 @@ module( "position, keyword, vertical", {
 asyncTest( "top", function() {
 	expect( 1 );
 	$( "#bg" ).css( "background-position", "100% top" );
-	testPolyfill( function() {
+	polyfillReady( function() {
 		deepEqual( $( "#bg img" ).position(), { left: 0, top: 0 }, "correct position" );
+		start();
 	} );
 } );
 asyncTest( "center", function() {
 	expect( 1 );
 	$( "#bg" ).css( "background-position", "100% center" );
-	testPolyfill( function() {
+	polyfillReady( function() {
 		deepEqual( $( "#bg img" ).position(), { left: 0, top: 100 }, "correct position" );
+		start();
 	} );
 } );
 asyncTest( "bottom", function() {
 	expect( 1 );
 	$( "#bg" ).css( "background-position", "0 bottom" );
-	testPolyfill( function() {
+	polyfillReady( function() {
 		deepEqual( $( "#bg img" ).position(), { left: 0, top: 200 }, "correct position" );
+		start();
 	} );
 } );
 
@@ -419,56 +454,100 @@ module( "property change", {
 			.css( { width: 300, height: 300, "background-position": "50% 50%" } )
 			.addClass( "background-image-300x400 background-size-cover" );
 		stop();
-		testPolyfill( function() {
+		polyfillReady( function() {
 			var img = $( "#bg img" );
 			equal( img.width(), 300, "verify width before test" );
 			equal( img.height(), 400, "verify height before test" );
 			deepEqual( img.position(), { left: 0, top: -50 }, "verify position before test" );
 			ok( r300x400.test( img.prop( "src" ) ), "verify img src before test" );
+			start();
 		} );
 	}
 } );
-asyncTest( "background-size", function() {
+test( "background-size", function() {
 	expect( 7 );
 	$( "#bg" ).addClass( "background-size-contain" ).removeClass( "background-size-cover" );
-	testPolyfill( function() {
-		var img = $( "#bg img" );
-		equal( img.width(), 225, "correct width" );
-		equal( img.height(), 300, "correct height" );
-		deepEqual( img.position(), { left: 37, top: 0 }, "correct position" );
-	} );
+	var img = $( "#bg img" );
+	equal( img.width(), 225, "correct width" );
+	equal( img.height(), 300, "correct height" );
+	deepEqual( img.position(), { left: 37, top: 0 }, "correct position" );
 } );
-asyncTest( "background-position", function() {
+test( "background-position", function() {
 	expect( 5 );
 	$( "#bg" ).css( "background-position", "0 100%" );
-	testPolyfill( function() {
-		var img = $( "#bg img" );
-		deepEqual( img.position(), { left: 0, top: -100 }, "correct position" );
-	} );
+	deepEqual( $( "#bg img" ).position(), { left: 0, top: -100 }, "correct position" );
 } );
-asyncTest( "background-image (DOM)", function() {
+test( "background-image, another image, DOM", function() {
 	expect( 8 );
 	$( "#bg" ).css( "background-image", url800x600 );
-	testPolyfill( function() {
-		var img = $( "#bg img" );
-		equal( img.width(), 400, "correct width" );
-		equal( img.height(), 300, "correct height" );
-		deepEqual( img.position(), { left: -50, top: 0 }, "correct position" );
-		ok( r800x600.test( img.prop( "src" ) ), "correct img src" );
-	} );
+	var img = $( "#bg img" );
+	equal( img.width(), 400, "correct width" );
+	equal( img.height(), 300, "correct height" );
+	deepEqual( img.position(), { left: -50, top: 0 }, "correct position" );
+	ok( r800x600.test( img.prop( "src" ) ), "correct img src" );
 } );
-asyncTest( "background-image (CSS class)", function() {
+test( "background-image, another image, CSS class", function() {
 	expect( 8 );
 	$( "#bg" ).addClass( "background-image-800x600" ).removeClass( "background-image-300x400" );
-	testPolyfill( function() {
-		var img = $( "#bg img" );
-		equal( img.width(), 400, "correct width" );
-		equal( img.height(), 300, "correct height" );
-		deepEqual( img.position(), { left: -50, top: 0 }, "correct position" );
-		ok( r800x600.test( img.prop( "src" ) ), "correct img src" );
+	var img = $( "#bg img" );
+	equal( img.width(), 400, "correct width" );
+	equal( img.height(), 300, "correct height" );
+	deepEqual( img.position(), { left: -50, top: 0 }, "correct position" );
+	ok( r800x600.test( img.prop( "src" ) ), "correct img src" );
+} );
+test( "background-image, no image, DOM", function() {
+	expect( 5 );
+	$( "#bg" ).css( "background-image", "none" );
+	equal( $( "#bg img" ).css( "display" ), "none", "img is hidden" );
+} );
+test( "background-image, no image, CSS class", function() {
+	expect( 5 );
+	$( "#bg" ).removeClass( "background-image-300x400" );
+	equal( $( "#bg img" ).css( "display" ), "none", "img is hidden" );
+} );
+
+
+
+module( "element not visible" );
+asyncTest( "display: none", function() {
+	expect( 1 );
+	$( "#bg" )
+		.css( { width: 300, height: 300, "background-position": "50% 50%", display: "none" } )
+		.addClass( "background-image-300x400 background-size-cover" );
+	polyfillReady( function() {
+		equal( $( "#bg img" ).css( "display" ), "none", "img is hidden" );
+		start();
+	} );
+} );
+asyncTest( "visibility: hidden", function() {
+	expect( 1 );
+	$( "#bg" )
+		.css( { width: 300, height: 300, "background-position": "50% 50%", visibility: "hidden" } )
+		.addClass( "background-image-300x400 background-size-cover" );
+	polyfillReady( function() {
+		equal( $( "#bg img" ).css( "display" ), "none", "img is hidden" );
+		start();
+	} );
+} );
+asyncTest( "zero width", function() {
+	expect( 1 );
+	$( "#bg" )
+		.css( { width: 0, height: 300, "background-position": "50% 50%" } )
+		.addClass( "background-image-300x400 background-size-cover" );
+	polyfillReady( function() {
+		equal( $( "#bg img" ).css( "display" ), "none", "img is hidden" );
+		start();
+	} );
+} );
+asyncTest( "zero height", function() {
+	expect( 1 );
+	$( "#bg" )
+		.css( { width: 300, height: 0, "background-position": "50% 50%" } )
+		.addClass( "background-image-300x400 background-size-cover" );
+	polyfillReady( function() {
+		equal( $( "#bg img" ).css( "display" ), "none", "img is hidden" );
+		start();
 	} );
 } );
 
-// visibility: hidden
 // image 404
-// background-image: none

@@ -1,3 +1,16 @@
+background-size polyfill redux
+==============================
+
+A continuation of louisremi's [background-size polyfill](https://github.com/louisremi/background-size-polyfill).
+
+Changes
+-------
+
+- Fixed JS error when using `left` or `top` for `background-position` (louisremi#14)  
+- Added unit tests  
+
+------------------------------------------------------------------------
+
 background-size polyfill
 ========================
 

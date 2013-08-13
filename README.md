@@ -7,6 +7,7 @@ Changes
 -------
 
 - Fixed JS error when using `left` or `top` for `background-position` (louisremi#14)  
+- Work around IE hang on unload when the JScript portion is greater than 512 bytes  
 - Added unit tests  
 
 ------------------------------------------------------------------------

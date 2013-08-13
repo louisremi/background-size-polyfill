@@ -468,3 +468,7 @@ asyncTest( "background-image (CSS class)", function() {
 		ok( r800x600.test( img.prop( "src" ) ), "correct img src" );
 	} );
 } );
+
+// visibility: hidden
+// image 404
+// background-image: none

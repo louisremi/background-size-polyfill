@@ -64,6 +64,7 @@ function init() {
 		wrapper: wrapper,
 		img: img,
 		style: {
+			backgroundImage: elementStyle.backgroundImage,
 			position: elementStyle.position,
 			zIndex: elementStyle.zIndex
 		}
@@ -188,7 +189,7 @@ function refreshBackgroundImage( element, expando, callback ) {
 		element.style.backgroundImage = "none";
 	
 	} else {
-		// the callback should be exacuted in all cases
+		// the callback should be executed in all cases
 		callback();
 	}
 }
@@ -312,12 +313,14 @@ function handleResize() {
 
 function restore() {
 	var expando = element.bgsExpando,
-		elementStyle = element.style;
+		elementStyle = element.style,
+		expandoStyle;
 
 	try {
-		elementStyle.position = expando.style.position;
-		elementStyle.zIndex = expando.style.zIndex;
-		elementStyle.backgroundImage = "url('" + expando.src + "')";
+		expandoStyle = expando.style;
+		elementStyle.backgroundImage = expandoStyle.backgroundImage;
+		elementStyle.position = expandoStyle.position;
+		elementStyle.zIndex = expandoStyle.zIndex;
 		element.removeChild( expando.wrapper );
 		element.bgsExpando = null;
 	} catch ( e ) {}

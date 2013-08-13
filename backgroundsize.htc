@@ -1,10 +1,12 @@
 <PUBLIC:COMPONENT lightWeight="true">
+<PUBLIC:ATTACH EVENT="oncontentready" ONEVENT="o.init()" />
+<PUBLIC:ATTACH EVENT="ondocumentready" ONEVENT="o.init()" />
 <PUBLIC:ATTACH EVENT="onpropertychange" ONEVENT="o.handlePropertychange()" />
 <PUBLIC:ATTACH EVENT="ondetach" ONEVENT="o.restore()" />
 <PUBLIC:ATTACH EVENT="onresize" FOR="window" ONEVENT="o.handleResize()" />
 <script type="text/javascript">
 
-var o;
+var o; // and so it is
 
 (function( element ) {
 
@@ -18,13 +20,16 @@ var rsrc = /url\(["']?(.*?)["']?\)/,
 	},
 	doc = element.document;
 
-init();
-
 o = {
+	init: init,
 	handlePropertychange: handlePropertychange,
 	restore: restore,
 	handleResize: handleResize
 };
+
+if ( element.readyState == "complete" ) {
+	init();
+}
 
 // remove the background-image and emulate it with a wrapped <img/>
 function init() {
@@ -71,6 +76,8 @@ function init() {
 	}
 
 	handlePropertychange();
+
+	o.init = function() {};
 }
 
 function refreshDisplay( element, expando ) {
@@ -297,6 +304,7 @@ function restore() {
 }
 
 })( element );
+
 </script>
 
 <!--

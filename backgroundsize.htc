@@ -20,7 +20,6 @@ init();
 function init() {
 	var wrapper = doc.createElement( "div" ),
 		img = doc.createElement( "img" ),
-		expando,
 		pos;
 
 	wrapper.style.position = "absolute";
@@ -45,7 +44,7 @@ function init() {
 	];
 
 	// save useful data for quick access
-	element.bgsExpando = expando = {
+	element.bgsExpando = {
 		wrapper: wrapper,
 		img: img,
 		backgroundSize: element.currentStyle['background-size'],
@@ -63,12 +62,7 @@ function init() {
 		element.style.position = "relative";
 	}
 
-	if ( refreshDisplay( element, expando ) ) {
-		refreshDimensions( element, expando );
-		refreshBackgroundImage( element, expando, function() {
-			updateBackground( element, expando );
-		});
-	}
+	handlePropertychange();
 }
 
 function refreshDisplay( element, expando ) {

@@ -1,8 +1,12 @@
 <component lightWeight="true">
-<attach event="onpropertychange" onevent="handlePropertychange()" />
-<attach event="ondetach" onevent="restore()" />
-<attach event="onresize" for="window" onevent="handleResize()" />
+<attach event="onpropertychange" onevent="o.handlePropertychange()" />
+<attach event="ondetach" onevent="o.restore()" />
+<attach event="onresize" for="window" onevent="o.handleResize()" />
 <script type="text/javascript">
+
+var o;
+
+(function( element ) {
 
 var rsrc = /url\(["']?(.*?)["']?\)/,
 	positions = {
@@ -16,24 +20,32 @@ var rsrc = /url\(["']?(.*?)["']?\)/,
 
 init();
 
+o = {
+	handlePropertychange: handlePropertychange,
+	restore: restore,
+	handleResize: handleResize
+};
+
 // remove the background-image and emulate it with a wrapped <img/>
 function init() {
 	var wrapper = doc.createElement( "div" ),
 		img = doc.createElement( "img" ),
-		style = element.style,
-		currentStyle = element.currentStyle;
+		wrapperStyle = wrapper.style,
+		imgStyle = img.style,
+		elementStyle = element.style,
+		elementCurrentStyle = element.currentStyle;
 
-	wrapper.style.position = "absolute";
-	wrapper.style.zIndex = -1;
-	wrapper.style.top = 0;
-	wrapper.style.right = 0;
-	wrapper.style.left = 0;
-	wrapper.style.bottom = 0;
-	wrapper.style.overflow = "hidden";
+	wrapperStyle.position = "absolute";
+	wrapperStyle.zIndex = -1;
+	wrapperStyle.top = 0;
+	wrapperStyle.right = 0;
+	wrapperStyle.left = 0;
+	wrapperStyle.bottom = 0;
+	wrapperStyle.overflow = "hidden";
 
 	img.alt = "";
-	img.style.position = "absolute";
-	img.style.width = img.style.height = "auto";
+	imgStyle.position = "absolute";
+	imgStyle.width = imgStyle.height = "auto";
 
 	wrapper.appendChild( img );
 
@@ -44,18 +56,18 @@ function init() {
 		wrapper: wrapper,
 		img: img,
 		style: {
-			position: style.position,
-			zIndex: style.zIndex
+			position: elementStyle.position,
+			zIndex: elementStyle.zIndex
 		}
 	};
 
 	// This is the part where we mess with the existing DOM
 	// to make sure that the background image is correctly zIndexed
-	if ( currentStyle.zIndex == "auto" ) {
-		style.zIndex = 0;
+	if ( elementCurrentStyle.zIndex == "auto" ) {
+		elementStyle.zIndex = 0;
 	}
-	if ( currentStyle.position == "static" ) {
-		style.position = "relative";
+	if ( elementCurrentStyle.position == "static" ) {
+		elementStyle.position = "relative";
 	}
 
 	handlePropertychange();
@@ -66,56 +78,55 @@ function refreshDisplay( element, expando ) {
 
 	if ( display != expando.display ) {
 		expando.display = display;
-		expando.somethingChanged = true;
+		expando.changed = true;
 	}
 
 	return display != "none";
 }
 
 function refreshDimensions( element, expando ) {
-	var currentStyle = element.currentStyle,
+	var elementCurrentStyle = element.currentStyle,
 		innerWidth = element.offsetWidth
-			- ( parseFloat( currentStyle.borderLeftWidth ) || 0 )
-			- ( parseFloat( currentStyle.borderRightWidth ) || 0 ),
+			- ( parseFloat( elementCurrentStyle.borderLeftWidth ) || 0 )
+			- ( parseFloat( elementCurrentStyle.borderRightWidth ) || 0 ),
 		innerHeight = element.offsetHeight
-			- ( parseFloat( currentStyle.borderTopWidth ) || 0 )
-			- ( parseFloat( currentStyle.borderBottomWidth ) || 0 );
+			- ( parseFloat( elementCurrentStyle.borderTopWidth ) || 0 )
+			- ( parseFloat( elementCurrentStyle.borderBottomWidth ) || 0 );
 
 	if ( innerWidth != expando.innerWidth || innerHeight != expando.innerHeight ) {
 		expando.innerWidth = innerWidth;
 		expando.innerHeight = innerHeight;
-		expando.somethingChanged = true;
+		expando.changed = true;
 	}
 }
 
 function refreshBackgroundProperties( element, expando ) {
-	var currentStyle = element.currentStyle,
+	var elementCurrentStyle = element.currentStyle,
 		pos = [
-			currentStyle.backgroundPositionX,
-			currentStyle.backgroundPositionY
+			elementCurrentStyle.backgroundPositionX,
+			elementCurrentStyle.backgroundPositionY
 		],
-		backgroundSize = currentStyle["background-size"],
+		size = elementCurrentStyle["background-size"],
 		// Only keywords or percentage values are supported
-		backgroundPositionX = positions[ pos[0] ] || parseFloat( pos[0] ) / 100 || 0,
-		backgroundPositionY = positions[ pos[1] ] || parseFloat( pos[1] ) / 100 || 0;
+		posX = positions[ pos[0] ] || parseFloat( pos[0] ) / 100 || 0,
+		posY = positions[ pos[1] ] || parseFloat( pos[1] ) / 100 || 0;
 
-	if ( backgroundSize != expando.backgroundSize ||
-			backgroundPositionX != expando.backgroundPositionX ||
-			backgroundPositionY != expando.backgroundPositionY ) {
-		expando.backgroundSize = backgroundSize;
-		expando.backgroundPositionX = backgroundPositionX;
-		expando.backgroundPositionY = backgroundPositionY;
-		expando.somethingChanged = true;
+	if ( size != expando.size || posX != expando.posX || posY != expando.posY ) {
+		expando.size = size;
+		expando.posX = posX;
+		expando.posY = posY;
+		expando.changed = true;
 	}
 }
 
 function refreshBackgroundImage( element, expando, callback ) {
 	var img = expando.img,
+		imgStyle = img.style,
 		src = ( rsrc.exec( element.currentStyle.backgroundImage ) || [] )[1];
 
-	if ( src && src != expando.backgroundSrc ) {
-		expando.backgroundSrc = src;
-		expando.somethingChanged = true;
+	if ( src && src != expando.src ) {
+		expando.src = src;
+		expando.changed = true;
 
 		img.onload = function() {
 			var width = img.width,
@@ -130,20 +141,20 @@ function refreshBackgroundImage( element, expando, callback ) {
 
 			callback();
 
-			img.style.visibility = "visible";
+			imgStyle.visibility = "visible";
 			img.onload = null;
 		};
 
-		img.style.visibility = "hidden";
-		img.src = expando.backgroundSrc;
+		imgStyle.visibility = "hidden";
+		img.src = expando.src;
 
 		// force onload execution
 		if ( img.readyState || img.complete ) {
 			img.src = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==";
-			img.src = expando.backgroundSrc;
+			img.src = expando.src;
 		}
 
-		expando.ignoreNextPropertyChange = true;
+		expando.ignoreChange = true;
 		element.style.backgroundImage = "none";
 	
 	} else {
@@ -153,32 +164,33 @@ function refreshBackgroundImage( element, expando, callback ) {
 }
 
 function updateBackground( element, expando ) {
-	if ( !expando.somethingChanged ) { return; }
+	if ( !expando.changed ) { return; }
 
 	var img = expando.img,
+		imgStyle = img.style,
 		elemRatio = expando.innerWidth / expando.innerHeight,
 		imgRatio = expando.imgWidth / expando.imgHeight,
 		prevConstrain = expando.constrain,
 		curConstrain,
 		delta;
 
-	if ( expando.backgroundSize == "contain" ) {
+	if ( expando.size == "contain" ) {
 		if ( imgRatio > elemRatio ) {
 			expando.constrain = curConstrain = "width";
 
 			delta = Math.floor(
 				( expando.innerHeight - expando.innerWidth / imgRatio )
-				* expando.backgroundPositionY
+				* expando.posY
 			);
 
-			img.style.top = delta + "px";
+			imgStyle.top = delta + "px";
 
 			// when switching from height to width constraint,
 			// make sure to release constraint on height and reset left
 			if ( curConstrain != prevConstrain ) {
-				img.style.width = "100%";
-				img.style.height = "auto";
-				img.style.left = 0;
+				imgStyle.width = "100%";
+				imgStyle.height = "auto";
+				imgStyle.left = 0;
 			}
 		
 		// elemRatio > imgRatio
@@ -187,35 +199,35 @@ function updateBackground( element, expando ) {
 
 			delta = Math.floor(
 				( expando.innerWidth - expando.innerHeight * imgRatio )
-				* expando.backgroundPositionX
+				* expando.posX
 			);
 
-			img.style.left = delta + "px";
+			imgStyle.left = delta + "px";
 
 			if ( curConstrain != prevConstrain ) {
-				img.style.width = "auto";
-				img.style.height = "100%";
-				img.style.top = 0;
+				imgStyle.width = "auto";
+				imgStyle.height = "100%";
+				imgStyle.top = 0;
 			}
 		}
 
-	} else if ( expando.backgroundSize == "cover" ) {
+	} else if ( expando.size == "cover" ) {
 		if ( imgRatio > elemRatio ) {
 			expando.constrain = curConstrain = "height";
 
 			delta = Math.floor(
 				( expando.innerHeight * imgRatio - expando.innerWidth )
-				* expando.backgroundPositionX
+				* expando.posX
 			);
 
-			img.style.left = -delta + "px";
+			imgStyle.left = -delta + "px";
 
 			// when switching from height to width constraint,
 			// make sure to release constraint on height and reset left
 			if ( curConstrain != prevConstrain ) {
-				img.style.width = "auto";
-				img.style.height = "100%";
-				img.style.top = 0;
+				imgStyle.width = "auto";
+				imgStyle.height = "100%";
+				imgStyle.top = 0;
 			}
 		
 		// elemRatio > imgRatio
@@ -224,20 +236,20 @@ function updateBackground( element, expando ) {
 
 			delta = Math.floor(
 				( expando.innerWidth / imgRatio - expando.innerHeight )
-				* expando.backgroundPositionY
+				* expando.posY
 			);
 
-			img.style.top = -delta + "px";
+			imgStyle.top = -delta + "px";
 
 			if ( curConstrain != prevConstrain ) {
-				img.style.width = "100%";
-				img.style.height = "auto";
-				img.style.left = 0;
+				imgStyle.width = "100%";
+				imgStyle.height = "auto";
+				imgStyle.left = 0;
 			}
 		}
 	}
 
-	expando.somethingChanged = false;
+	expando.changed = false;
 }
 
 // handle different style changes
@@ -246,8 +258,8 @@ function handlePropertychange() {
 
 	// this prevents handling propertychange events caused by this script
 	// TODO: make it reliable
-	if ( expando.ignoreNextPropertyChange ) {
-		expando.ignoreNextPropertyChange = false;
+	if ( expando.ignoreChange ) {
+		expando.ignoreChange = false;
 		return;
 	}
 
@@ -273,17 +285,18 @@ function handleResize() {
 
 function restore() {
 	var expando = element.bgsExpando,
-		style = element.style;
+		elementStyle = element.style;
 
 	try {
-		style.position = expando.style.position;
-		style.zIndex = expando.style.zIndex;
-		style.backgroundImage = "url('" + expando.backgroundSrc + "')";
+		elementStyle.position = expando.style.position;
+		elementStyle.zIndex = expando.style.zIndex;
+		elementStyle.backgroundImage = "url('" + expando.src + "')";
 		element.removeChild( expando.wrapper );
 		element.bgsExpando = null;
-	} catch(e) {}
+	} catch ( e ) {}
 }
 
+})( element );
 </script>
 
 <!--

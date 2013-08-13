@@ -19,7 +19,9 @@ init();
 // remove the background-image and emulate it with a wrapped <img/>
 function init() {
 	var wrapper = doc.createElement( "div" ),
-		img = doc.createElement( "img" );
+		img = doc.createElement( "img" ),
+		style = element.style,
+		currentStyle = element.currentStyle;
 
 	wrapper.style.position = "absolute";
 	wrapper.style.zIndex = -1;
@@ -40,16 +42,20 @@ function init() {
 	// save useful data for quick access
 	element.bgsExpando = {
 		wrapper: wrapper,
-		img: img
+		img: img,
+		style: {
+			position: style.position,
+			zIndex: style.zIndex
+		}
 	};
 
 	// This is the part where we mess with the existing DOM
 	// to make sure that the background image is correctly zIndexed
-	if ( element.currentStyle.zIndex == "auto" ) {
-		element.style.zIndex = 0;
+	if ( currentStyle.zIndex == "auto" ) {
+		style.zIndex = 0;
 	}
-	if ( element.currentStyle.position == "static" ) {
-		element.style.position = "relative";
+	if ( currentStyle.position == "static" ) {
+		style.position = "relative";
 	}
 
 	handlePropertychange();
@@ -67,12 +73,13 @@ function refreshDisplay( element, expando ) {
 }
 
 function refreshDimensions( element, expando ) {
-	var innerWidth = element.offsetWidth
-			- ( parseFloat( element.currentStyle.borderLeftWidth ) || 0 )
-			- ( parseFloat( element.currentStyle.borderRightWidth ) || 0 ),
+	var currentStyle = element.currentStyle,
+		innerWidth = element.offsetWidth
+			- ( parseFloat( currentStyle.borderLeftWidth ) || 0 )
+			- ( parseFloat( currentStyle.borderRightWidth ) || 0 ),
 		innerHeight = element.offsetHeight
-			- ( parseFloat( element.currentStyle.borderTopWidth ) || 0 )
-			- ( parseFloat( element.currentStyle.borderBottomWidth ) || 0 );
+			- ( parseFloat( currentStyle.borderTopWidth ) || 0 )
+			- ( parseFloat( currentStyle.borderBottomWidth ) || 0 );
 
 	if ( innerWidth != expando.innerWidth || innerHeight != expando.innerHeight ) {
 		expando.innerWidth = innerWidth;
@@ -82,11 +89,12 @@ function refreshDimensions( element, expando ) {
 }
 
 function refreshBackgroundProperties( element, expando ) {
-	var pos = [
-			element.currentStyle.backgroundPositionX,
-			element.currentStyle.backgroundPositionY
+	var currentStyle = element.currentStyle,
+		pos = [
+			currentStyle.backgroundPositionX,
+			currentStyle.backgroundPositionY
 		],
-		backgroundSize = element.currentStyle["background-size"],
+		backgroundSize = currentStyle["background-size"],
 		// Only keywords or percentage values are supported
 		backgroundPositionX = positions[ pos[0] ] || parseFloat( pos[0] ) / 100 || 0,
 		backgroundPositionY = positions[ pos[1] ] || parseFloat( pos[1] ) / 100 || 0;
@@ -264,10 +272,13 @@ function handleResize() {
 }
 
 function restore() {
-	var expando = element.bgsExpando;
+	var expando = element.bgsExpando,
+		style = element.style;
 
 	try {
-		element.style.backgroundImage = "url('" + expando.backgroundSrc + "')";
+		style.position = expando.style.position;
+		style.zIndex = expando.style.zIndex;
+		style.backgroundImage = "url('" + expando.backgroundSrc + "')";
 		element.removeChild( expando.wrapper );
 		element.bgsExpando = null;
 	} catch(e) {}

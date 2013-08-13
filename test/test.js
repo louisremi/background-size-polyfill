@@ -14,17 +14,22 @@ function testPolyfill( test ) {
 
 module( "general" );
 
-asyncTest( "html structure", function() {
-	expect( 5 );
+asyncTest( "setup and teardown", function() {
+	expect( 10 );
 
 	var div = $( "#bg" );
 
 	div
 		.append( "<span></span>" )
-		.css( { width: 800, height: 600 } )
-		.addClass( "background-image-800x600 background-size-cover" );
+		.css( {
+			position: "static",
+			"background-image": url800x600,
+			width: 800,
+			height: 600
+		} )
+		.addClass( "background-size-cover polyfill" );
 
-	testPolyfill( function() {
+	setTimeout( function() {
 		var children = div.children(),
 			first = children.first(),
 			grandchildren = first.children();
@@ -34,7 +39,21 @@ asyncTest( "html structure", function() {
 		equal( grandchildren.length, 1, "one child appended to wrapper" );
 		equal( ( grandchildren.prop( "nodeName" ) || "" ).toUpperCase(), "IMG", "img appended to wrapper" );
 		ok( r800x600.test( grandchildren.prop( "src" ) ), "img has correct src" );
-	} );
+
+		div.removeClass( "polyfill" );
+
+		setTimeout( function() {
+			var children = div.children();
+
+			equal( children.length, 1, "wrapper removed" );
+			equal( ( children.prop( "nodeName" ) || "" ).toUpperCase(), "SPAN", "element content unaffected" );
+			equal( div[0].style.position, "static", "element inline position restored" );
+			strictEqual( div[0].style.zIndex, "", "element (lack of) inline z-index restored" );
+			equal( div[0].style.backgroundImage, url800x600, "element inline background-image restored" );
+
+			start();
+		}, 100 );
+	}, 100 );
 } );
 
 

@@ -22,6 +22,7 @@ var rsrc = /url\(["']?(.*?)["']?\)/,
 	spacer = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==",
 	noop = function() {};
 
+// don't allow anything until init() is called
 o = {
 	init: init,
 	handlePropertychange: noop,
@@ -77,12 +78,15 @@ function init() {
 		elementStyle.position = "relative";
 	}
 
+	// allow init() to be called only once
 	o.init = noop;
 
+	// check if browser supports our data uri spacer gif
 	img.onload = img.onerror = function() {
 		if ( img.width != 1 || img.height != 1 ) {
 			spacer = spacerPath;
 		}
+
 		img.onload = img.onerror = null;
 		imgStyle.visibility = "visible";
 
@@ -159,16 +163,16 @@ function refreshBackgroundImage( element, expando, callback ) {
 				height = img.height;
 
 			// ignore onload on the proxy image
-			if ( width == 1 && height == 1 ) { return; }
+			if ( width != 1 || height != 1 ) {
+				expando.imgWidth = width;
+				expando.imgHeight = height;
+				expando.constrain = false;
 
-			expando.imgWidth = width;
-			expando.imgHeight = height;
-			expando.constrain = false;
+				callback();
 
-			callback();
-
-			imgStyle.visibility = "visible";
-			img.onload = null;
+				imgStyle.visibility = "visible";
+				img.onload = null;
+			}
 		};
 
 		imgStyle.visibility = "hidden";
@@ -190,8 +194,6 @@ function refreshBackgroundImage( element, expando, callback ) {
 }
 
 function updateBackground( element, expando ) {
-	if ( !expando.changed ) { return; }
-
 	var img = expando.img,
 		imgStyle = img.style,
 		elemRatio = expando.innerWidth / expando.innerHeight,
@@ -200,77 +202,79 @@ function updateBackground( element, expando ) {
 		curConstrain,
 		delta;
 
-	if ( expando.size == "contain" ) {
-		if ( imgRatio > elemRatio ) {
-			expando.constrain = curConstrain = "width";
+	if ( expando.changed ) {
+		if ( expando.size == "contain" ) {
+			if ( imgRatio > elemRatio ) {
+				expando.constrain = curConstrain = "width";
 
-			delta = Math.floor(
-				( expando.innerHeight - expando.innerWidth / imgRatio )
-				* expando.posY
-			);
+				delta = Math.floor(
+					( expando.innerHeight - expando.innerWidth / imgRatio )
+					* expando.posY
+				);
 
-			imgStyle.top = delta + "px";
+				imgStyle.top = delta + "px";
 
-			// when switching from height to width constraint,
-			// make sure to release constraint on height and reset left
-			if ( curConstrain != prevConstrain ) {
-				imgStyle.width = "100%";
-				imgStyle.height = "auto";
-				imgStyle.left = 0;
-			}
+				// when switching from height to width constraint,
+				// make sure to release constraint on height and reset left
+				if ( curConstrain != prevConstrain ) {
+					imgStyle.width = "100%";
+					imgStyle.height = "auto";
+					imgStyle.left = 0;
+				}
 		
-		// elemRatio > imgRatio
-		} else {
-			expando.constrain = curConstrain = "height";
+			// elemRatio > imgRatio
+			} else {
+				expando.constrain = curConstrain = "height";
 
-			delta = Math.floor(
-				( expando.innerWidth - expando.innerHeight * imgRatio )
-				* expando.posX
-			);
+				delta = Math.floor(
+					( expando.innerWidth - expando.innerHeight * imgRatio )
+					* expando.posX
+				);
 
-			imgStyle.left = delta + "px";
+				imgStyle.left = delta + "px";
 
-			if ( curConstrain != prevConstrain ) {
-				imgStyle.width = "auto";
-				imgStyle.height = "100%";
-				imgStyle.top = 0;
+				if ( curConstrain != prevConstrain ) {
+					imgStyle.width = "auto";
+					imgStyle.height = "100%";
+					imgStyle.top = 0;
+				}
 			}
-		}
 
-	} else if ( expando.size == "cover" ) {
-		if ( imgRatio > elemRatio ) {
-			expando.constrain = curConstrain = "height";
+		} else if ( expando.size == "cover" ) {
+			if ( imgRatio > elemRatio ) {
+				expando.constrain = curConstrain = "height";
 
-			delta = Math.floor(
-				( expando.innerHeight * imgRatio - expando.innerWidth )
-				* expando.posX
-			);
+				delta = Math.floor(
+					( expando.innerHeight * imgRatio - expando.innerWidth )
+					* expando.posX
+				);
 
-			imgStyle.left = -delta + "px";
+				imgStyle.left = -delta + "px";
 
-			// when switching from height to width constraint,
-			// make sure to release constraint on height and reset left
-			if ( curConstrain != prevConstrain ) {
-				imgStyle.width = "auto";
-				imgStyle.height = "100%";
-				imgStyle.top = 0;
-			}
+				// when switching from height to width constraint,
+				// make sure to release constraint on height and reset left
+				if ( curConstrain != prevConstrain ) {
+					imgStyle.width = "auto";
+					imgStyle.height = "100%";
+					imgStyle.top = 0;
+				}
 		
-		// elemRatio > imgRatio
-		} else {
-			expando.constrain = curConstrain = "width";
+			// elemRatio > imgRatio
+			} else {
+				expando.constrain = curConstrain = "width";
 
-			delta = Math.floor(
-				( expando.innerWidth / imgRatio - expando.innerHeight )
-				* expando.posY
-			);
+				delta = Math.floor(
+					( expando.innerWidth / imgRatio - expando.innerHeight )
+					* expando.posY
+				);
 
-			imgStyle.top = -delta + "px";
+				imgStyle.top = -delta + "px";
 
-			if ( curConstrain != prevConstrain ) {
-				imgStyle.width = "100%";
-				imgStyle.height = "auto";
-				imgStyle.left = 0;
+				if ( curConstrain != prevConstrain ) {
+					imgStyle.width = "100%";
+					imgStyle.height = "auto";
+					imgStyle.left = 0;
+				}
 			}
 		}
 	}
@@ -282,20 +286,17 @@ function updateBackground( element, expando ) {
 function handlePropertychange() {
 	var expando = element.bgsExpando;
 
-	// this prevents handling propertychange events caused by this script
+	// expando.ignoreChange prevents handling propertychange events caused by this script
 	// TODO: make it reliable
-	if ( expando.ignoreChange ) {
-		expando.ignoreChange = false;
-		return;
-	}
-
-	if ( refreshDisplay( element, expando ) ) {
+	if ( !expando.ignoreChange && refreshDisplay( element, expando ) ) {
 		refreshDimensions( element, expando );
 		refreshBackgroundProperties( element, expando );
 		refreshBackgroundImage( element, expando, function() {
 			updateBackground( element, expando );
 		});
 	}
+
+	expando.ignoreChange = false;
 }
 
 function handleResize() {

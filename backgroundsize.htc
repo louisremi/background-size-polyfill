@@ -50,6 +50,7 @@ function init() {
 	wrapperStyle.left = 0;
 	wrapperStyle.bottom = 0;
 	wrapperStyle.overflow = "hidden";
+	wrapperStyle.visibility = "inherit";
 
 	img.alt = "";
 	imgStyle.position = "absolute";
@@ -89,9 +90,8 @@ function init() {
 		}
 
 		img.onload = img.onerror = null;
-		imgStyle.visibility = "visible";
-
-		handlePropertychange();
+		imgStyle.display = "none";
+		imgStyle.visibility = "inherit";
 
 		o = {
 			init: noop,
@@ -99,9 +99,21 @@ function init() {
 			restore: restore,
 			handleResize: handleResize
 		};
-	}
+
+		handlePropertychange();
+	};
+
+	imgStyle.display = "block";
 	imgStyle.visibility = "hidden";
 	img.src = spacer;
+}
+
+// this prevents handling propertychange events caused by this script
+function suspendPropertychange( callback ) {
+	var fn = o.handlePropertychange;
+	o.handlePropertychange = noop;
+	( callback || noop )();
+	o.handlePropertychange = fn;
 }
 
 function refreshDisplay( element, expando ) {
@@ -151,43 +163,66 @@ function refreshBackgroundProperties( element, expando ) {
 }
 
 function refreshBackgroundImage( element, expando, callback ) {
-	var img = expando.img,
+	var elementStyle = element.style,
+		expandoStyle = expando.style,
+		img = expando.img,
 		imgStyle = img.style,
-		src = ( rsrc.exec( element.currentStyle.backgroundImage ) || [] )[1];
+		src;
 
-	if ( src && src != expando.src ) {
+	if ( ( rsrc.exec( elementStyle.backgroundImage ) || [] )[1] == spacer ) {
+		suspendPropertychange( function() {
+			elementStyle.backgroundImage = expandoStyle.backgroundImage;
+		} );
+	} else {
+		expandoStyle.backgroundImage = elementStyle.backgroundImage;
+	}
+
+	src = ( rsrc.exec( element.currentStyle.backgroundImage ) || [] )[1];
+
+	suspendPropertychange( function() {
+		elementStyle.backgroundImage = "url('" + spacer + "')";
+	} );
+
+	if ( src != expando.src ) {
 		expando.src = src;
 		expando.changed = true;
 
-		img.onload = function() {
-			var width = img.width,
-				height = img.height;
+		if ( src ) {
+			img.onload = function() {
+				var width = img.width,
+					height = img.height;
 
-			// ignore onload on the proxy image
-			if ( width != 1 || height != 1 ) {
-				expando.imgWidth = width;
-				expando.imgHeight = height;
-				expando.constrain = false;
+				// ignore onload on the proxy image
+				if ( width != 1 || height != 1 ) {
+					expando.imgWidth = width;
+					expando.imgHeight = height;
+					expando.constrain = false;
 
-				callback();
+					callback();
 
-				imgStyle.visibility = "visible";
-				img.onload = null;
-			}
-		};
+					imgStyle.visibility = "inherit";
+					img.onload = null;
+				}
+			};
 
-		imgStyle.visibility = "hidden";
-		img.src = expando.src;
-
-		// force onload execution
-		if ( img.readyState || img.complete ) {
-			img.src = spacer;
+			imgStyle.display = "block";
+			imgStyle.visibility = "hidden";
 			img.src = expando.src;
+
+			// force onload execution
+			if ( img.readyState || img.complete ) {
+				img.src = spacer;
+				img.src = expando.src;
+			}
+
+		} else {
+			expando.imgWidth = 0;
+			expando.imgHeight = 0;
+			expando.constrain = false;
+
+			callback();
 		}
 
-		expando.ignoreChange = true;
-		element.style.backgroundImage = "none";
-	
 	} else {
 		// the callback should be executed in all cases
 		callback();
@@ -197,86 +232,98 @@ function refreshBackgroundImage( element, expando, callback ) {
 function updateBackground( element, expando ) {
 	var img = expando.img,
 		imgStyle = img.style,
-		elemRatio = expando.innerWidth / expando.innerHeight,
-		imgRatio = expando.imgWidth / expando.imgHeight,
+		innerWidth = expando.innerWidth,
+		innerHeight = expando.innerHeight,
+		imgWidth = expando.imgWidth,
+		imgHeight = expando.imgHeight,
 		prevConstrain = expando.constrain,
 		curConstrain,
+		elemRatio,
+		imgRatio,
 		delta;
 
 	if ( expando.changed ) {
-		if ( expando.size == "contain" ) {
-			if ( imgRatio > elemRatio ) {
-				expando.constrain = curConstrain = "width";
+		if ( innerWidth && innerHeight && imgWidth && imgHeight ) {
+			elemRatio = innerWidth / innerHeight;
+			imgRatio = imgWidth / imgHeight;
 
-				delta = Math.floor(
-					( expando.innerHeight - expando.innerWidth / imgRatio )
-					* expando.posY
-				);
+			if ( expando.size == "contain" ) {
+				if ( imgRatio > elemRatio ) {
+					expando.constrain = curConstrain = "width";
 
-				imgStyle.top = delta + "px";
+					delta = Math.floor(
+						( innerHeight - innerWidth / imgRatio )
+						* expando.posY
+					);
 
-				// when switching from height to width constraint,
-				// make sure to release constraint on height and reset left
-				if ( curConstrain != prevConstrain ) {
-					imgStyle.width = "100%";
-					imgStyle.height = "auto";
-					imgStyle.left = 0;
-				}
+					imgStyle.top = delta + "px";
+
+					// when switching from height to width constraint,
+					// make sure to release constraint on height and reset left
+					if ( curConstrain != prevConstrain ) {
+						imgStyle.width = "100%";
+						imgStyle.height = "auto";
+						imgStyle.left = 0;
+					}
 		
-			// elemRatio > imgRatio
-			} else {
-				expando.constrain = curConstrain = "height";
+				// elemRatio > imgRatio
+				} else {
+					expando.constrain = curConstrain = "height";
 
-				delta = Math.floor(
-					( expando.innerWidth - expando.innerHeight * imgRatio )
-					* expando.posX
-				);
+					delta = Math.floor(
+						( innerWidth - innerHeight * imgRatio )
+						* expando.posX
+					);
 
-				imgStyle.left = delta + "px";
+					imgStyle.left = delta + "px";
 
-				if ( curConstrain != prevConstrain ) {
-					imgStyle.width = "auto";
-					imgStyle.height = "100%";
-					imgStyle.top = 0;
+					if ( curConstrain != prevConstrain ) {
+						imgStyle.width = "auto";
+						imgStyle.height = "100%";
+						imgStyle.top = 0;
+					}
+				}
+
+			} else if ( expando.size == "cover" ) {
+				if ( imgRatio > elemRatio ) {
+					expando.constrain = curConstrain = "height";
+
+					delta = Math.floor(
+						( innerHeight * imgRatio - innerWidth )
+						* expando.posX
+					);
+
+					imgStyle.left = -delta + "px";
+
+					// when switching from height to width constraint,
+					// make sure to release constraint on height and reset left
+					if ( curConstrain != prevConstrain ) {
+						imgStyle.width = "auto";
+						imgStyle.height = "100%";
+						imgStyle.top = 0;
+					}
+		
+				// elemRatio > imgRatio
+				} else {
+					expando.constrain = curConstrain = "width";
+
+					delta = Math.floor(
+						( innerWidth / imgRatio - innerHeight )
+						* expando.posY
+					);
+
+					imgStyle.top = -delta + "px";
+
+					if ( curConstrain != prevConstrain ) {
+						imgStyle.width = "100%";
+						imgStyle.height = "auto";
+						imgStyle.left = 0;
+					}
 				}
 			}
 
-		} else if ( expando.size == "cover" ) {
-			if ( imgRatio > elemRatio ) {
-				expando.constrain = curConstrain = "height";
-
-				delta = Math.floor(
-					( expando.innerHeight * imgRatio - expando.innerWidth )
-					* expando.posX
-				);
-
-				imgStyle.left = -delta + "px";
-
-				// when switching from height to width constraint,
-				// make sure to release constraint on height and reset left
-				if ( curConstrain != prevConstrain ) {
-					imgStyle.width = "auto";
-					imgStyle.height = "100%";
-					imgStyle.top = 0;
-				}
-		
-			// elemRatio > imgRatio
-			} else {
-				expando.constrain = curConstrain = "width";
-
-				delta = Math.floor(
-					( expando.innerWidth / imgRatio - expando.innerHeight )
-					* expando.posY
-				);
-
-				imgStyle.top = -delta + "px";
-
-				if ( curConstrain != prevConstrain ) {
-					imgStyle.width = "100%";
-					imgStyle.height = "auto";
-					imgStyle.left = 0;
-				}
-			}
+		} else {
+			imgStyle.display = "none";
 		}
 	}
 
@@ -287,17 +334,13 @@ function updateBackground( element, expando ) {
 function handlePropertychange() {
 	var expando = element.bgsExpando;
 
-	// expando.ignoreChange prevents handling propertychange events caused by this script
-	// TODO: make it reliable
-	if ( !expando.ignoreChange && refreshDisplay( element, expando ) ) {
+	if ( refreshDisplay( element, expando ) ) {
 		refreshDimensions( element, expando );
 		refreshBackgroundProperties( element, expando );
 		refreshBackgroundImage( element, expando, function() {
 			updateBackground( element, expando );
 		});
 	}
-
-	expando.ignoreChange = false;
 }
 
 function handleResize() {
@@ -317,11 +360,20 @@ function restore() {
 		expandoStyle;
 
 	try {
+		o = {
+			init: noop,
+			handlePropertychange: noop,
+			restore: noop,
+			handleResize: noop
+		};
+
 		expandoStyle = expando.style;
 		elementStyle.backgroundImage = expandoStyle.backgroundImage;
 		elementStyle.position = expandoStyle.position;
 		elementStyle.zIndex = expandoStyle.zIndex;
+
 		element.removeChild( expando.wrapper );
+
 		element.bgsExpando = null;
 	} catch ( e ) {}
 }

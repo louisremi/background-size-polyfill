@@ -9,6 +9,7 @@ Changes
 - Added support for dynamically changing position and size of the background image (partial reimplementation of louisremi#8)  
 - Added support for dynamically changing background image with CSS classes  
 - Added support for dynamically setting background image to `none` (louisremi#13)  
+- Added debouncing of window resize events (alternative implementation of louisremi#17)  
 - Fixed JS error when using `left` or `top` for `background-position` (louisremi#14)  
 - Work around IE hang on unload when the JScript portion is greater than 512 bytes  
 - Added unit tests  

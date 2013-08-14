@@ -20,7 +20,9 @@ var rsrc = /url\(["']?(.*?)["']?\)/,
 	},
 	doc = element.document,
 	spacer = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==",
-	noop = function() {};
+	noop = function() {},
+	resizeInterval = 100,
+	resizeId;
 
 // don't allow anything until init() is called
 o = {
@@ -344,8 +346,11 @@ function handlePropertychange() {
 }
 
 function handleResize() {
-	// TODO: throttle resize events
+	clearTimeout( resizeId );
+	resizeId = setTimeout( updateAfterResize, resizeInterval );
+}
 
+function updateAfterResize() {
 	var expando = element.bgsExpando;
 
 	if ( expando.display != "none" ) {

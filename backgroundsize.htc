@@ -21,7 +21,9 @@ var rsrc = /url\(["']?(.*?)["']?\)/,
 	doc = element.document,
 	spacer = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==",
 	noop = function() {},
+	propertychangeInterval = 50,
 	resizeInterval = 100,
+	propertychangeId,
 	resizeId;
 
 // don't allow anything until init() is called
@@ -99,7 +101,7 @@ function init() {
 			handleResize: handleResize
 		};
 
-		handlePropertychange();
+		updateAfterPropertychange();
 	} );
 }
 
@@ -313,8 +315,13 @@ function updateBackground( element, expando ) {
 	expando.changed = false;
 }
 
-// handle different style changes
 function handlePropertychange() {
+	clearTimeout( propertychangeId );
+	propertychangeId = setTimeout( updateAfterPropertychange, propertychangeInterval );
+}
+
+// handle different style changes
+function updateAfterPropertychange() {
 	var expando = element.bgsExpando;
 
 	if ( refreshDisplay( element, expando ) ) {
@@ -345,14 +352,15 @@ function restore() {
 		elementStyle = element.style,
 		expandoStyle;
 
-	clearTimeout( resizeId );
-
 	o = {
 		init: noop,
 		handlePropertychange: noop,
 		restore: noop,
 		handleResize: noop
 	};
+
+	clearTimeout( propertychangeId );
+	clearTimeout( resizeId );
 
 	try {
 		expandoStyle = expando.style;

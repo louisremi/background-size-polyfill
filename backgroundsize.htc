@@ -364,14 +364,16 @@ function restore() {
 		elementStyle = element.style,
 		expandoStyle;
 
-	try {
-		o = {
-			init: noop,
-			handlePropertychange: noop,
-			restore: noop,
-			handleResize: noop
-		};
+	clearTimeout( resizeId );
 
+	o = {
+		init: noop,
+		handlePropertychange: noop,
+		restore: noop,
+		handleResize: noop
+	};
+
+	try {
 		expandoStyle = expando.style;
 		elementStyle.backgroundImage = expandoStyle.backgroundImage;
 		elementStyle.position = expandoStyle.position;

@@ -3,15 +3,18 @@ var r800x600 = /images\/algeria\.jpg$/,
 	url800x600 = "url(../images/algeria.jpg)",
 	url300x400 = "url(../images/jar1.jpg)";
 
+function onbackgroundupdate( callback ) {
+	var el = $( "#bg" )[0];
+
+	el.onbackgroundupdate = function () {
+		el.onbackgroundupdate = null;
+		callback();
+	};
+}
+
 function polyfillReady( callback ) {
-	$( "#bg" )
-		.on( "readystatechange", function() {
-			if ( this.readyState == "complete" ) {
-				$( this ).off( "readystatechange" );
-				( callback || $.noop )();
-			}
-		} )
-		.addClass( "polyfill" );
+	onbackgroundupdate( callback );
+	$( "#bg" ).addClass( "polyfill" );
 }
 
 window.bgsSpacerGif = "../spacer.gif";
@@ -464,73 +467,85 @@ module( "property change", {
 		} );
 	}
 } );
-test( "background-size", function() {
+asyncTest( "background-size", function() {
 	expect( 7 );
+	onbackgroundupdate( function() {
+		var img = $( "#bg img" );
+		equal( img.width(), 225, "correct width" );
+		equal( img.height(), 300, "correct height" );
+		deepEqual( img.position(), { left: 37, top: 0 }, "correct position" );
+		start();
+	} );
 	$( "#bg" ).addClass( "background-size-contain" ).removeClass( "background-size-cover" );
-	var img = $( "#bg img" );
-	equal( img.width(), 225, "correct width" );
-	equal( img.height(), 300, "correct height" );
-	deepEqual( img.position(), { left: 37, top: 0 }, "correct position" );
 } );
-test( "background-position", function() {
+asyncTest( "background-position", function() {
 	expect( 5 );
+	onbackgroundupdate( function() {
+		deepEqual( $( "#bg img" ).position(), { left: 0, top: -100 }, "correct position" );
+		start();
+	} );
 	$( "#bg" ).css( "background-position", "0 100%" );
-	deepEqual( $( "#bg img" ).position(), { left: 0, top: -100 }, "correct position" );
 } );
-test( "background-image, DOM", function() {
+asyncTest( "background-image, DOM", function() {
 	expect( 13 );
 
 	var div = $( "#bg" ), img = div.find( "img" );
 
+	onbackgroundupdate( function() {
+		equal( img.css( "display" ), "none", "none: img is hidden" );
+
+		onbackgroundupdate( function() {
+			equal( img.width(), 400, "first: correct width" );
+			equal( img.height(), 300, "first: correct height" );
+			deepEqual( img.position(), { left: -50, top: 0 }, "first: correct position" );
+			ok( r800x600.test( img.prop( "src" ) ), "first: correct img src" );
+
+			onbackgroundupdate( function() {
+				equal( img.width(), 300, "second: correct width" );
+				equal( img.height(), 400, "second: correct height" );
+				deepEqual( img.position(), { left: 0, top: -50 }, "second: correct position:" );
+				ok( r300x400.test( img.prop( "src" ) ), "second: correct img src" );
+
+				start();
+			} );
+			div.css( "background-image", "" );
+		} );
+		div.css( "background-image", url800x600 );
+	} );
 	div.css( "background-image", "none" );
-	equal( img.css( "display" ), "none", "none: img is hidden" );
-
-	div.css( "background-image", url800x600 );
-	equal( img.width(), 400, "first: correct width" );
-	equal( img.height(), 300, "first: correct height" );
-	deepEqual( img.position(), { left: -50, top: 0 }, "first: correct position" );
-	ok( r800x600.test( img.prop( "src" ) ), "first: correct img src" );
-
-	div.css( "background-image", "" );
-	equal( img.width(), 300, "second: correct width" );
-	equal( img.height(), 400, "second: correct height" );
-	deepEqual( img.position(), { left: 0, top: -50 }, "second: correct position:" );
-	ok( r300x400.test( img.prop( "src" ) ), "second: correct img src" );
 } );
-test( "background-image, CSS class", function() {
+asyncTest( "background-image, CSS class", function() {
 	expect( 13 );
 
 	var div = $( "#bg" ), img = div.find( "img" );
 
+	onbackgroundupdate( function() {
+		equal( img.css( "display" ), "none", "none: img is hidden" );
+
+		onbackgroundupdate( function() {
+			equal( img.width(), 400, "first: correct width" );
+			equal( img.height(), 300, "first: correct height" );
+			deepEqual( img.position(), { left: -50, top: 0 }, "first: correct position" );
+			ok( r800x600.test( img.prop( "src" ) ), "first: correct img src" );
+
+			onbackgroundupdate( function() {
+				equal( img.width(), 300, "second: correct width" );
+				equal( img.height(), 400, "second: correct height" );
+				deepEqual( img.position(), { left: 0, top: -50 }, "second: correct position:" );
+				ok( r300x400.test( img.prop( "src" ) ), "second: correct img src" );
+
+				start();
+			} );
+			div.addClass( "background-image-300x400" ).removeClass( "background-image-800x600" );
+		} );
+		div.addClass( "background-image-800x600" );
+	} );
 	div.removeClass( "background-image-300x400" );
-	equal( img.css( "display" ), "none", "none: img is hidden" );
-
-	div.addClass( "background-image-800x600" );
-	equal( img.width(), 400, "first: correct width" );
-	equal( img.height(), 300, "first: correct height" );
-	deepEqual( img.position(), { left: -50, top: 0 }, "first: correct position" );
-	ok( r800x600.test( img.prop( "src" ) ), "first: correct img src" );
-
-	div.addClass( "background-image-300x400" ).removeClass( "background-image-800x600" );
-	equal( img.width(), 300, "second: correct width" );
-	equal( img.height(), 400, "second: correct height" );
-	deepEqual( img.position(), { left: 0, top: -50 }, "second: correct position:" );
-	ok( r300x400.test( img.prop( "src" ) ), "second: correct img src" );
 } );
 
 
 
 module( "element not visible" );
-asyncTest( "display: none", function() {
-	expect( 1 );
-	$( "#bg" )
-		.css( { width: 300, height: 300, "background-position": "50% 50%", display: "none" } )
-		.addClass( "background-image-300x400 background-size-cover" );
-	polyfillReady( function() {
-		equal( $( "#bg img" ).css( "display" ), "none", "img is hidden" );
-		start();
-	} );
-} );
 asyncTest( "visibility: hidden", function() {
 	expect( 1 );
 	$( "#bg" )
@@ -563,3 +578,4 @@ asyncTest( "zero height", function() {
 } );
 
 // image 404
+// clone element

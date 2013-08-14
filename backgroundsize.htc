@@ -4,6 +4,7 @@
 <PUBLIC:ATTACH EVENT="onpropertychange" ONEVENT="o.handlePropertychange()" />
 <PUBLIC:ATTACH EVENT="ondetach" ONEVENT="o.restore()" />
 <PUBLIC:ATTACH EVENT="onresize" FOR="window" ONEVENT="o.handleResize()" />
+<PUBLIC:EVENT NAME="onbackgroundupdate" ID="updateEvent" />
 <script type="text/javascript">
 
 var o; // and so it is
@@ -24,7 +25,8 @@ var rsrc = /url\(["']?(.*?)["']?\)/,
 	propertychangeInterval = 50,
 	resizeInterval = 100,
 	propertychangeId,
-	resizeId;
+	resizeId,
+	updateId;
 
 // don't allow anything until init() is called
 o = {
@@ -310,6 +312,11 @@ function updateBackground( element, expando ) {
 		}
 
 		imgStyle.display = display;
+
+		// we may end up not firing some events
+		// but if we don't clear them, they may fire after restore() is called
+		clearTimeout( updateId );
+		updateId = setTimeout( function() { updateEvent.fire(); }, 0 );
 	}
 
 	expando.changed = false;
@@ -361,6 +368,7 @@ function restore() {
 
 	clearTimeout( propertychangeId );
 	clearTimeout( resizeId );
+	clearTimeout( updateId );
 
 	try {
 		expandoStyle = expando.style;

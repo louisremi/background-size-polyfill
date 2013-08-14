@@ -57,6 +57,7 @@ function init() {
 	img.alt = "";
 	imgStyle.position = "absolute";
 	imgStyle.width = imgStyle.height = "auto";
+	imgStyle.visibility = "inherit";
 
 	wrapper.appendChild( img );
 
@@ -86,14 +87,10 @@ function init() {
 	o.init = noop;
 
 	// check if browser supports our data uri spacer gif
-	img.onload = img.onerror = function() {
-		if ( img.width != 1 || img.height != 1 ) {
+	getImageDimensions( spacer, function( width, height ) {
+		if ( width != 1 || height != 1 ) {
 			spacer = spacerPath;
 		}
-
-		img.onload = img.onerror = null;
-		imgStyle.display = "none";
-		imgStyle.visibility = "inherit";
 
 		o = {
 			init: noop,
@@ -103,18 +100,14 @@ function init() {
 		};
 
 		handlePropertychange();
-	};
-
-	imgStyle.display = "block";
-	imgStyle.visibility = "hidden";
-	img.src = spacer;
+	} );
 }
 
 // this prevents handling propertychange events caused by this script
 function suspendPropertychange( callback ) {
 	var fn = o.handlePropertychange;
 	o.handlePropertychange = noop;
-	( callback || noop )();
+	callback();
 	o.handlePropertychange = fn;
 }
 
@@ -190,32 +183,15 @@ function refreshBackgroundImage( element, expando, callback ) {
 		expando.changed = true;
 
 		if ( src ) {
-			img.onload = function() {
-				var width = img.width,
-					height = img.height;
+			getImageDimensions( src, function( width, height ) {
+				expando.imgWidth = width;
+				expando.imgHeight = height;
+				expando.constrain = false;
 
-				// ignore onload on the proxy image
-				if ( width != 1 || height != 1 ) {
-					expando.imgWidth = width;
-					expando.imgHeight = height;
-					expando.constrain = false;
+				callback();
+			} );
 
-					callback();
-
-					imgStyle.visibility = "inherit";
-					img.onload = null;
-				}
-			};
-
-			imgStyle.display = "block";
-			imgStyle.visibility = "hidden";
-			img.src = expando.src;
-
-			// force onload execution
-			if ( img.readyState || img.complete ) {
-				img.src = spacer;
-				img.src = expando.src;
-			}
+			img.src = src;
 
 		} else {
 			expando.imgWidth = 0;
@@ -242,7 +218,8 @@ function updateBackground( element, expando ) {
 		curConstrain,
 		elemRatio,
 		imgRatio,
-		delta;
+		delta,
+		display;
 
 	if ( expando.changed ) {
 		if ( innerWidth && innerHeight && imgWidth && imgHeight ) {
@@ -324,9 +301,13 @@ function updateBackground( element, expando ) {
 				}
 			}
 
+			display = "block";
+
 		} else {
-			imgStyle.display = "none";
+			display = "none";
 		}
+
+		imgStyle.display = display;
 	}
 
 	expando.changed = false;
@@ -383,6 +364,17 @@ function restore() {
 
 		element.bgsExpando = null;
 	} catch ( e ) {}
+}
+
+function getImageDimensions( src, callback ) {
+	var img = doc.createElement( "img" );
+
+	img.onload = img.onerror = function() {
+		callback( img.width, img.height );
+		img = img.onload = img.onerror = null;
+	};
+
+	img.src = src;
 }
 
 })( element, window.bgsSpacerGif );

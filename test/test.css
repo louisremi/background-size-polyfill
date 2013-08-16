@@ -4,12 +4,6 @@
 .background-size-contain {
 	background-size: contain;
 }
-.background-image-800x600 {
-	background-image: url(../images/algeria.jpg);
-}
-.background-image-300x400 {
-	background-image: url(../images/jar1.jpg);
-}
 .polyfill {
 	-ms-behavior: url(../backgroundsize.htc);
 	behavior: url(../backgroundsize.htc);

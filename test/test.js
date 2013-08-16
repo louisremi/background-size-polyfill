@@ -1,14 +1,46 @@
-var r800x600 = /images\/algeria\.jpg$/,
-	r300x400 = /images\/jar1\.jpg$/,
-	url800x600 = "url(../images/algeria.jpg)",
-	url300x400 = "url(../images/jar1.jpg)";
+var urls = {
+	"800x600": {
+		src: "../images/algeria.jpg",
+		re: /images\/algeria\.jpg/
+	},
+	"300x400": {
+		src: "../images/jar1.jpg",
+		re: /images\/jar1\.jpg/
+	}
+};
 
-function onbackgroundupdate( callback ) {
+function isUrl( size, src ) { return urls[size].re.test( src ); }
+
+function getUrl( size ) { return "url(" + urls[size].src + "?_=" + Math.random() + ")"; }
+
+function setupCSSClasses() {
+	var def = [ "<style id='customCSSClasses' type='text/css'>" ],
+		size;
+
+	for ( size in urls ) {
+		def.push( ".background-image-", size, " { background-image: ", getUrl( size ), "; } " );
+	}
+
+	$( def.join( "" ) + "</style>" ).appendTo( "head" );
+}
+
+function teardownCSSClasses() { $( "#customCSSClasses" ).remove(); }
+
+function onbackgroundupdate( skip, callback ) {
 	var el = $( "#bg" )[0];
 
+	if ( !callback ) {
+		callback = skip;
+		skip = 0;
+	}
+
 	el.onbackgroundupdate = function () {
-		el.onbackgroundupdate = null;
-		callback();
+		if ( skip <= 0 ) {
+			el.onbackgroundupdate = null;
+			callback();
+		} else {
+			skip--;
+		}
 	};
 }
 
@@ -21,18 +53,21 @@ window.bgsSpacerGif = "../spacer.gif";
 
 
 
-module( "general" );
+module( "general", {
+	setup: setupCSSClasses,
+	teardown: teardownCSSClasses
+} );
 
 asyncTest( "setup and teardown", function() {
 	expect( 10 );
 
-	var div = $( "#bg" );
+	var div = $( "#bg" ), url = getUrl( "800x600" );
 
 	div
 		.append( "<span></span>" )
 		.css( {
 			position: "static",
-			"background-image": url800x600,
+			"background-image": url,
 			width: 800,
 			height: 600
 		} )
@@ -47,7 +82,7 @@ asyncTest( "setup and teardown", function() {
 		equal( ( first.prop( "nodeName" ) || "" ).toUpperCase(), "DIV", "wrapper inserted before element content" );
 		equal( grandchildren.length, 1, "one child appended to wrapper" );
 		equal( ( grandchildren.prop( "nodeName" ) || "" ).toUpperCase(), "IMG", "img appended to wrapper" );
-		ok( r800x600.test( grandchildren.prop( "src" ) ), "img has correct src" );
+		ok( isUrl( "800x600", grandchildren.prop( "src" ) ), "img has correct src" );
 
 		div.removeClass( "polyfill" );
 
@@ -58,7 +93,7 @@ asyncTest( "setup and teardown", function() {
 			equal( ( children.prop( "nodeName" ) || "" ).toUpperCase(), "SPAN", "element content unaffected" );
 			equal( div[0].style.position, "static", "element inline position restored" );
 			strictEqual( div[0].style.zIndex, "", "element (lack of) inline z-index restored" );
-			equal( div[0].style.backgroundImage, url800x600, "element inline background-image restored" );
+			equal( div[0].style.backgroundImage, url, "element inline background-image restored" );
 
 			start();
 		}, 100 );
@@ -69,10 +104,12 @@ asyncTest( "setup and teardown", function() {
 
 module( "cover, portrait", {
 	setup: function() {
+		setupCSSClasses();
 		$( "#bg" )
 			.css( "background-position", "50% 50%" )
 			.addClass( "background-image-300x400 background-size-cover" );
-	}
+	},
+	teardown: teardownCSSClasses
 } );
 asyncTest( "0.5x", function() {
 	expect( 3 );
@@ -123,10 +160,12 @@ asyncTest( "2x", function() {
 
 module( "cover, landscape", {
 	setup: function() {
+		setupCSSClasses();
 		$( "#bg" )
 			.css( "background-position", "50% 50%" )
 			.addClass( "background-image-800x600 background-size-cover" );
-	}
+	},
+	teardown: teardownCSSClasses
 } );
 asyncTest( "0.5x", function() {
 	expect( 3 );
@@ -177,10 +216,12 @@ asyncTest( "2x", function() {
 
 module( "contain, portrait", {
 	setup: function() {
+		setupCSSClasses();
 		$( "#bg" )
 			.css( "background-position", "50% 50%" )
 			.addClass( "background-image-300x400 background-size-contain" );
-	}
+	},
+	teardown: teardownCSSClasses
 } );
 asyncTest( "0.5x", function() {
 	expect( 3 );
@@ -231,10 +272,12 @@ asyncTest( "2x", function() {
 
 module( "contain, landscape", {
 	setup: function() {
+		setupCSSClasses();
 		$( "#bg" )
 			.css( "background-position", "50% 50%" )
 			.addClass( "background-image-800x600 background-size-contain" );
-	}
+	},
+	teardown: teardownCSSClasses
 } );
 asyncTest( "0.5x", function() {
 	expect( 3 );
@@ -285,10 +328,12 @@ asyncTest( "2x", function() {
 
 module( "position, percent, horizontal", {
 	setup: function() {
+		setupCSSClasses();
 		$( "#bg" )
 			.css( { width: 600, height: 600 } )
 			.addClass( "background-image-800x600 background-size-cover" );
-	}
+	},
+	teardown: teardownCSSClasses
 } );
 asyncTest( "0", function() {
 	expect( 1 );
@@ -335,10 +380,12 @@ asyncTest( "100%", function() {
 
 module( "position, percent, vertical", {
 	setup: function() {
+		setupCSSClasses();
 		$( "#bg" )
 			.css( { width: 800, height: 800 } )
 			.addClass( "background-image-800x600 background-size-contain" );
-	}
+	},
+	teardown: teardownCSSClasses
 } );
 asyncTest( "0", function() {
 	expect( 1 );
@@ -385,10 +432,12 @@ asyncTest( "100%", function() {
 
 module( "position, keyword, horizontal", {
 	setup: function() {
+		setupCSSClasses();
 		$( "#bg" )
 			.css( { width: 600, height: 600 } )
 			.addClass( "background-image-800x600 background-size-cover" );
-	}
+	},
+	teardown: teardownCSSClasses
 } );
 asyncTest( "left", function() {
 	expect( 1 );
@@ -419,10 +468,12 @@ asyncTest( "right", function() {
 
 module( "position, keyword, vertical", {
 	setup: function() {
+		setupCSSClasses();
 		$( "#bg" )
 			.css( { width: 800, height: 800 } )
 			.addClass( "background-image-800x600 background-size-contain" );
-	}
+	},
+	teardown: teardownCSSClasses
 } );
 asyncTest( "top", function() {
 	expect( 1 );
@@ -453,99 +504,234 @@ asyncTest( "bottom", function() {
 
 module( "property change", {
 	setup: function() {
+		setupCSSClasses();
 		$( "#bg" )
 			.css( { width: 300, height: 300, "background-position": "50% 50%" } )
-			.addClass( "background-image-300x400 background-size-cover" );
-		stop();
-		polyfillReady( function() {
-			var img = $( "#bg img" );
-			equal( img.width(), 300, "verify width before test" );
-			equal( img.height(), 400, "verify height before test" );
-			deepEqual( img.position(), { left: 0, top: -50 }, "verify position before test" );
-			ok( r300x400.test( img.prop( "src" ) ), "verify img src before test" );
-			start();
-		} );
-	}
+			.addClass( "background-size-cover" );
+	},
+	teardown: teardownCSSClasses
 } );
 asyncTest( "background-size", function() {
-	expect( 7 );
-	onbackgroundupdate( function() {
-		var img = $( "#bg img" );
-		equal( img.width(), 225, "correct width" );
-		equal( img.height(), 300, "correct height" );
-		deepEqual( img.position(), { left: 37, top: 0 }, "correct position" );
-		start();
+	expect( 6 );
+
+	var div = $( "#bg" );
+	div.addClass( "background-image-300x400" );
+
+	polyfillReady( function() {
+		var img = div.find( "img" );
+		equal( img.width(), 300, "verify width before test" );
+		equal( img.height(), 400, "verify height before test" );
+		deepEqual( img.position(), { left: 0, top: -50 }, "verify position before test" );
+
+		onbackgroundupdate( function() {
+			var img = div.find( "img" );
+			equal( img.width(), 225, "correct width" );
+			equal( img.height(), 300, "correct height" );
+			deepEqual( img.position(), { left: 37, top: 0 }, "correct position" );
+
+			start();
+		} );
+
+		div.addClass( "background-size-contain" ).removeClass( "background-size-cover" );
 	} );
-	$( "#bg" ).addClass( "background-size-contain" ).removeClass( "background-size-cover" );
 } );
 asyncTest( "background-position", function() {
-	expect( 5 );
-	onbackgroundupdate( function() {
-		deepEqual( $( "#bg img" ).position(), { left: 0, top: -100 }, "correct position" );
-		start();
+	expect( 2 );
+
+	var div = $( "#bg" );
+	div.addClass( "background-image-300x400" );
+
+	polyfillReady( function() {
+		deepEqual( div.find( "img" ).position(), { left: 0, top: -50 }, "verify position before test" );
+
+		// 3 propertychange events will be triggered
+		//     backgroundPositionX
+		//     backgroundPositionY
+		//     backgroundPosition
+		// only the first two will trigger a background update event
+		// so skip one update event
+		onbackgroundupdate( 1, function() {
+			deepEqual( div.find( "img" ).position(), { left: 0, top: -100 }, "correct position" );
+
+			start();
+		} );
+
+		div.css( "background-position", "0 100%" );
 	} );
-	$( "#bg" ).css( "background-position", "0 100%" );
 } );
-asyncTest( "background-image, DOM", function() {
-	expect( 13 );
+asyncTest( "background-image, no background, inline image", function() {
+	expect( 6 );
 
-	var div = $( "#bg" ), img = div.find( "img" );
+	var div = $( "#bg" );
 
-	onbackgroundupdate( function() {
-		equal( img.css( "display" ), "none", "none: img is hidden" );
+	polyfillReady( function() {
+		var img = div.find( "img" );
+		equal( div.find( "img" ).css( "display" ), "none", "verify img is hidden before test" );
 
 		onbackgroundupdate( function() {
-			equal( img.width(), 400, "first: correct width" );
-			equal( img.height(), 300, "first: correct height" );
-			deepEqual( img.position(), { left: -50, top: 0 }, "first: correct position" );
-			ok( r800x600.test( img.prop( "src" ) ), "first: correct img src" );
+			var img = div.find( "img" );
+			equal( img.css( "display" ), "block", "img is visible" );
+			equal( img.width(), 400, "correct width" );
+			equal( img.height(), 300, "correct height" );
+			deepEqual( img.position(), { left: -50, top: 0 }, "correct position" );
+			ok( isUrl( "800x600", img.prop( "src" ) ), "correct img src" );
 
-			onbackgroundupdate( function() {
-				equal( img.width(), 300, "second: correct width" );
-				equal( img.height(), 400, "second: correct height" );
-				deepEqual( img.position(), { left: 0, top: -50 }, "second: correct position:" );
-				ok( r300x400.test( img.prop( "src" ) ), "second: correct img src" );
-
-				start();
-			} );
-			div.css( "background-image", "" );
+			start();
 		} );
-		div.css( "background-image", url800x600 );
+
+		div.css( "background-image", getUrl( "800x600" ) );
 	} );
-	div.css( "background-image", "none" );
 } );
-asyncTest( "background-image, CSS class", function() {
-	expect( 13 );
+asyncTest( "background-image, class background, inline none", function() {
+	expect( 3 );
 
-	var div = $( "#bg" ), img = div.find( "img" );
+	var div = $( "#bg" );
+	div.addClass( "background-image-300x400" );
 
-	onbackgroundupdate( function() {
-		equal( img.css( "display" ), "none", "none: img is hidden" );
+	polyfillReady( function() {
+		var img = div.find( "img" );
+		equal( img.width(), 300, "verify width before test" );
+		equal( img.height(), 400, "verify height before test" );
 
 		onbackgroundupdate( function() {
-			equal( img.width(), 400, "first: correct width" );
-			equal( img.height(), 300, "first: correct height" );
-			deepEqual( img.position(), { left: -50, top: 0 }, "first: correct position" );
-			ok( r800x600.test( img.prop( "src" ) ), "first: correct img src" );
+			equal( div.find( "img" ).css( "display" ), "none", "img is hidden" );
 
-			onbackgroundupdate( function() {
-				equal( img.width(), 300, "second: correct width" );
-				equal( img.height(), 400, "second: correct height" );
-				deepEqual( img.position(), { left: 0, top: -50 }, "second: correct position:" );
-				ok( r300x400.test( img.prop( "src" ) ), "second: correct img src" );
-
-				start();
-			} );
-			div.addClass( "background-image-300x400" ).removeClass( "background-image-800x600" );
+			start();
 		} );
+
+		div.css( "background-image", "none" );
+	} );
+} );
+asyncTest( "background-image, class background, inline different image", function() {
+	expect( 8 );
+
+	var div = $( "#bg" );
+	div.addClass( "background-image-300x400" );
+
+	polyfillReady( function() {
+		var img = div.find( "img" );
+		equal( img.width(), 300, "verify width before test" );
+		equal( img.height(), 400, "verify height before test" );
+		deepEqual( img.position(), { left: 0, top: -50 }, "verify position before test" );
+		ok( isUrl( "300x400", img.prop( "src" ) ), "verify img src before test '" + img.prop( "src" ) + "'" );
+
+		onbackgroundupdate( function() {
+			var img = div.find( "img" );
+			equal( img.width(), 400, "correct width" );
+			equal( img.height(), 300, "correct height" );
+			deepEqual( img.position(), { left: -50, top: 0 }, "correct position" );
+			ok( isUrl( "800x600", img.prop( "src" ) ), "correct img src '" + img.prop( "src" ) + "'" );
+
+			start();
+		} );
+
+		div.css( "background-image", getUrl( "800x600" ) );
+	} );
+} );
+asyncTest( "background-image, class background, inline blank", function() {
+	expect( 8 );
+
+	var div = $( "#bg" );
+	div
+		.css( "background-image", getUrl( "300x400" ) )
+		.addClass( "background-image-800x600" );
+
+	polyfillReady( function() {
+		var img = div.find( "img" );
+		equal( img.width(), 300, "verify width before test" );
+		equal( img.height(), 400, "verify height before test" );
+		deepEqual( img.position(), { left: 0, top: -50 }, "verify position before test" );
+		ok( isUrl( "300x400", img.prop( "src" ) ), "verify img src before test" );
+
+		onbackgroundupdate( function() {
+			var img = div.find( "img" );
+			equal( img.width(), 400, "correct width" );
+			equal( img.height(), 300, "correct height" );
+			deepEqual( img.position(), { left: -50, top: 0 }, "correct position" );
+			ok( isUrl( "800x600", img.prop( "src" ) ), "correct img src" );
+
+			start();
+		} );
+
+		div.css( "background-image", "" );
+	} );
+} );
+asyncTest( "background-image, add class", function() {
+	expect( 6 );
+
+	var div = $( "#bg" );
+
+	polyfillReady( function() {
+		var img = div.find( "img" );
+		equal( div.find( "img" ).css( "display" ), "none", "verify img is hidden before test" );
+
+		onbackgroundupdate( function() {
+			var img = div.find( "img" );
+			equal( img.css( "display" ), "block", "img is visible" );
+			equal( img.width(), 400, "correct width" );
+			equal( img.height(), 300, "correct height" );
+			deepEqual( img.position(), { left: -50, top: 0 }, "correct position" );
+			ok( isUrl( "800x600", img.prop( "src" ) ), "correct img src" );
+
+			start();
+		} );
+
 		div.addClass( "background-image-800x600" );
 	} );
-	div.removeClass( "background-image-300x400" );
+} );
+asyncTest( "background-image, remove class", function() {
+	expect( 3 );
+
+	var div = $( "#bg" );
+	div.addClass( "background-image-300x400" );
+
+	polyfillReady( function() {
+		var img = div.find( "img" );
+		equal( img.width(), 300, "verify width before test" );
+		equal( img.height(), 400, "verify height before test" );
+
+		onbackgroundupdate( function() {
+			equal( div.find( "img" ).css( "display" ), "none", "img is hidden" );
+
+			start();
+		} );
+
+		div.removeClass( "background-image-300x400" );
+	} );
+} );
+asyncTest( "background-image, change class", function() {
+	expect( 8 );
+
+	var div = $( "#bg" );
+	div.addClass( "background-image-800x600 background-image-300x400" );
+
+	polyfillReady( function() {
+		var img = div.find( "img" );
+		equal( img.width(), 300, "verify width before test" );
+		equal( img.height(), 400, "verify height before test" );
+		deepEqual( img.position(), { left: 0, top: -50 }, "verify position before test" );
+		ok( isUrl( "300x400", img.prop( "src" ) ), "verify img src before test" );
+
+		onbackgroundupdate( function() {
+			var img = div.find( "img" );
+			equal( img.width(), 400, "correct width" );
+			equal( img.height(), 300, "correct height" );
+			deepEqual( img.position(), { left: -50, top: 0 }, "correct position" );
+			ok( isUrl( "800x600", img.prop( "src" ) ), "correct img src" );
+
+			start();
+		} );
+
+		div.removeClass( "background-image-300x400" );
+	} );
 } );
 
 
 
-module( "element not visible" );
+module( "element not visible", {
+	setup: setupCSSClasses,
+	teardown: teardownCSSClasses
+} );
 asyncTest( "visibility: hidden", function() {
 	expect( 1 );
 	$( "#bg" )

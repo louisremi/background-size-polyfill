@@ -348,9 +348,9 @@ function handleResize() {
 
 function restore() {
 	var expando = element.bgsExpando,
-		elementStyle = element.style,
-		img = expando.loadImg,
-		expandoRestore;
+		loadImg,
+		style,
+		restore;
 
 	o = {
 		init: noop,
@@ -363,20 +363,27 @@ function restore() {
 	clearTimeout( processSnapshotsId );
 	clearTimeout( updateEventId );
 
-	if ( img ) {
-		img.onload = img.onerror = null;
-		clearTimeout( img.callbackId );
-	}
-
 	try {
-		expandoRestore = expando.restore;
-		elementStyle.backgroundImage = expandoRestore.backgroundImage;
-		elementStyle.position = expandoRestore.position;
-		elementStyle.zIndex = expandoRestore.zIndex;
+		if ( expando ) {
+			loadImg = expando.loadImg;
+			if ( loadImg ) {
+				loadImg.onload = loadImg.onerror = null;
+				clearTimeout( loadImg.callbackId );
+			}
 
-		element.removeChild( expando.wrapper );
+			style = element.style;
+			restore = expando.restore;
+			if ( restore && style ) {
+				style.backgroundImage = restore.backgroundImage;
+				style.position = restore.position;
+				style.zIndex = restore.zIndex;
+			}
+
+			element.removeChild( expando.wrapper );
+		}
 
 		element.bgsExpando = null;
+
 	} catch ( e ) {}
 }
 

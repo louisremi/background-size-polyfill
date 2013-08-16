@@ -20,7 +20,7 @@ var rsrc = /url\(["']?(.*?)["']?\)/,
 		center: .5
 	},
 	doc = element.document,
-	spacer = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==",
+	spacer = "data:image/gif;base64,R0lGODlhAQABAIABAP///wAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==",
 	noop = function() {},
 	resizeInterval = 100,
 	resizeId,

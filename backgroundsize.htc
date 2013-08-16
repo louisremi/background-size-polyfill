@@ -131,6 +131,34 @@ function setStyles( el ) {
 		style.maxHeight = "none";
 }
 
+function getImageDimensions( expando, src, callback ) {
+	var img;
+
+	if ( src ) {
+		img = doc.createElement( "img" );
+		img.onload = img.onerror = function() {
+			var width = img.width,
+				height = img.height;
+			if ( window.event.type == "error" ) {
+				width = height = 0;
+			}
+			expando.loadImg = img = img.onload = img.onerror = null;
+			callback( width, height );
+		};
+		img.src = src;
+
+	} else {
+		img = {
+			callbackId: setTimeout( function() {
+				expando.loadImg = img = null;
+				callback( 0, 0 );
+			}, 0 )
+		};
+	}
+
+	expando.loadImg = img;
+}
+
 // this prevents handling propertychange events caused by this script
 function suspendPropertychange( callback ) {
 	var fn = o.handlePropertychange;
@@ -385,34 +413,8 @@ function restore() {
 		element.bgsExpando = null;
 
 	} catch ( e ) {}
-}
 
-function getImageDimensions( expando, src, callback ) {
-	var img;
-
-	if ( src ) {
-		img = doc.createElement( "img" );
-		img.onload = img.onerror = function() {
-			var width = img.width,
-				height = img.height;
-			if ( window.event.type == "error" ) {
-				width = height = 0;
-			}
-			expando.loadImg = img = img.onload = img.onerror = null;
-			callback( width, height );
-		};
-		img.src = src;
-
-	} else {
-		img = {
-			callbackId: setTimeout( function() {
-				expando.loadImg = img = null;
-				callback( 0, 0 );
-			}, 0 )
-		};
-	}
-
-	expando.loadImg = img;
+	element = spacerPath = doc = null;
 }
 
 })( element, window.bgsSpacerGif );

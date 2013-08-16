@@ -44,23 +44,17 @@ function init() {
 	var wrapper = doc.createElement( "div" ),
 		img = doc.createElement( "img" ),
 		wrapperStyle = wrapper.style,
-		imgStyle = img.style,
 		elementStyle = element.style,
 		elementCurrentStyle = element.currentStyle;
 
-	wrapperStyle.position = "absolute";
-	wrapperStyle.zIndex = -1;
-	wrapperStyle.top = 0;
-	wrapperStyle.right = 0;
-	wrapperStyle.left = 0;
-	wrapperStyle.bottom = 0;
-	wrapperStyle.overflow = "hidden";
-	wrapperStyle.visibility = "inherit";
+	setStyles( wrapper );
+	wrapperStyle.top =
+		wrapperStyle.right =
+		wrapperStyle.bottom =
+		wrapperStyle.left = 0;
 
+	setStyles( img );
 	img.alt = "";
-	imgStyle.position = "absolute";
-	imgStyle.width = imgStyle.height = "auto";
-	imgStyle.visibility = "inherit";
 
 	wrapper.appendChild( img );
 
@@ -106,6 +100,34 @@ function init() {
 
 		handlePropertychange();
 	} );
+}
+
+function setStyles( el ) {
+	var style = el.style;
+
+	style.position = "absolute";
+	style.display = "block";
+	style.zIndex = -1;
+	style.overflow = "hidden";
+	style.visibility = "inherit";
+	style.width =
+		style.height =
+		style.top =
+		style.right =
+		style.bottom =
+		style.left =
+		style.cursor = "auto";
+	style.margin =
+		style.padding =
+		style.border =
+		style.outline =
+		style.fontSize =
+		style.lineHeight =
+		style.minWidth =
+		style.minHeight = 0;
+	style.background =
+		style.maxWidth =
+		style.maxHeight = "none";
 }
 
 // this prevents handling propertychange events caused by this script
@@ -356,20 +378,15 @@ function getImageDimensions( src, callback ) {
 
 	if ( src ) {
 		img = doc.createElement( "img" );
-
 		img.onload = img.onerror = function() {
 			var width = img.width,
 				height = img.height;
-
 			if ( window.event.type == "error" ) {
 				width = height = 0;
 			}
-
 			callback( width, height );
-
 			img = img.onload = img.onerror = null;
 		};
-
 		img.src = src;
 
 	} else {

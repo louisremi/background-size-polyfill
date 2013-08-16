@@ -45,7 +45,8 @@ function init() {
 		img = doc.createElement( "img" ),
 		wrapperStyle = wrapper.style,
 		elementStyle = element.style,
-		elementCurrentStyle = element.currentStyle;
+		elementCurrentStyle = element.currentStyle,
+		expando;
 
 	setStyles( wrapper );
 	wrapperStyle.top =
@@ -61,7 +62,7 @@ function init() {
 	element.insertBefore( wrapper, element.firstChild );
 
 	// save useful data for quick access
-	element.bgsExpando = {
+	element.bgsExpando = expando = {
 		wrapper: wrapper,
 		img: img,
 		restore: {
@@ -86,7 +87,7 @@ function init() {
 	o.init = noop;
 
 	// check if browser supports our data uri spacer gif
-	getImageDimensions( spacer, function( width, height ) {
+	getImageDimensions( expando, spacer, function( width, height ) {
 		if ( width != 1 || height != 1 ) {
 			spacer = spacerPath;
 		}
@@ -207,7 +208,7 @@ function processSnapshots( element, expando ) {
 		snapshot = snapshots.pop();
 		snapshots.length = 0;
 
-		getImageDimensions( snapshot.src, function( width, height ) {
+		getImageDimensions( expando, snapshot.src, function( width, height ) {
 			snapshot.imgWidth = width;
 			snapshot.imgHeight = height;
 
@@ -348,6 +349,7 @@ function handleResize() {
 function restore() {
 	var expando = element.bgsExpando,
 		elementStyle = element.style,
+		img = expando.loadImg,
 		expandoRestore;
 
 	o = {
@@ -361,6 +363,11 @@ function restore() {
 	clearTimeout( processSnapshotsId );
 	clearTimeout( updateEventId );
 
+	if ( img ) {
+		img.onload = img.onerror = null;
+		clearTimeout( img.callbackId );
+	}
+
 	try {
 		expandoRestore = expando.restore;
 		elementStyle.backgroundImage = expandoRestore.backgroundImage;
@@ -373,7 +380,7 @@ function restore() {
 	} catch ( e ) {}
 }
 
-function getImageDimensions( src, callback ) {
+function getImageDimensions( expando, src, callback ) {
 	var img;
 
 	if ( src ) {
@@ -384,14 +391,21 @@ function getImageDimensions( src, callback ) {
 			if ( window.event.type == "error" ) {
 				width = height = 0;
 			}
+			expando.loadImg = img = img.onload = img.onerror = null;
 			callback( width, height );
-			img = img.onload = img.onerror = null;
 		};
 		img.src = src;
 
 	} else {
-		setTimeout( function() { callback( 0, 0 ); }, 0 );
+		img = {
+			callbackId: setTimeout( function() {
+				expando.loadImg = img = null;
+				callback( 0, 0 );
+			}, 0 )
+		};
 	}
+
+	expando.loadImg = img;
 }
 
 })( element, window.bgsSpacerGif );

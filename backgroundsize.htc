@@ -179,7 +179,11 @@ function processSnapshots( element, expando ) {
 
 	if ( !snapshots.processing && snapshots.length ) {
 		snapshots.processing = true;
-		snapshot = snapshots.shift();
+
+		// since each snapshot includes changes all previous snapshots,
+		// we can skip to the last one
+		snapshot = snapshots.pop();
+		snapshots.length = 0;
 
 		getImageDimensions( snapshot.src, function( width, height ) {
 			snapshot.imgWidth = width;

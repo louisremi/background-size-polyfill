@@ -26,21 +26,12 @@ function setupCSSClasses() {
 
 function teardownCSSClasses() { $( "#customCSSClasses" ).remove(); }
 
-function onbackgroundupdate( skip, callback ) {
+function onbackgroundupdate( callback ) {
 	var el = $( "#bg" )[0];
 
-	if ( !callback ) {
-		callback = skip;
-		skip = 0;
-	}
-
 	el.onbackgroundupdate = function () {
-		if ( skip <= 0 ) {
-			el.onbackgroundupdate = null;
-			callback();
-		} else {
-			skip--;
-		}
+		el.onbackgroundupdate = null;
+		callback();
 	};
 }
 
@@ -550,7 +541,7 @@ asyncTest( "background-position", function() {
 		//     backgroundPosition
 		// only the first two will trigger a background update event
 		// so skip one update event
-		onbackgroundupdate( 1, function() {
+		onbackgroundupdate( function() {
 			deepEqual( div.find( "img" ).position(), { left: 0, top: -100 }, "correct position" );
 
 			start();

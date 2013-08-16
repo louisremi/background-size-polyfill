@@ -65,13 +65,18 @@ function init() {
 	element.bgsExpando = expando = {
 		wrapper: wrapper,
 		img: img,
+		// styles to restore on detach
 		restore: {
 			backgroundImage: elementStyle.backgroundImage,
 			position: elementStyle.position,
 			zIndex: elementStyle.zIndex
 		},
-		current: {},
-		snapshots: [] // queue
+		current: {},    // current snapshot
+		snapshots: [],  // queue of snapshots to process
+		loadImg: null,  // temp img element from getImageDimensions
+		display: null,  // element's display property
+		changed: false, // whether element's display property has changed
+		ignore: false   // whether to ignore the next property change event
 	};
 
 	// This is the part where we mess with the existing DOM
@@ -196,7 +201,10 @@ function takeSnapshot( element, expando, callback ) {
 			size: elementCurrentStyle["background-size"],
 			// Only keywords or percentage values are supported
 			posX: positions[ pos[0] ] || parseFloat( pos[0] ) / 100 || 0,
-			posY: positions[ pos[1] ] || parseFloat( pos[1] ) / 100 || 0
+			posY: positions[ pos[1] ] || parseFloat( pos[1] ) / 100 || 0,
+			src: "",
+			imgWidth: 0,
+			imgHeight: 0
 		};
 
 	if ( ( rsrc.exec( elementStyle.backgroundImage ) || [] )[1] == spacer ) {

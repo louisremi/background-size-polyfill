@@ -720,14 +720,17 @@ asyncTest( "background-image, change class", function() {
 
 
 module( "element not visible", {
-	setup: setupCSSClasses,
+	setup: function() {
+		setupCSSClasses();
+		$( "#bg" )
+			.css( { width: 300, height: 300, "background-position": "50% 50%" } )
+			.addClass( "background-image-300x400 background-size-cover" );
+	},
 	teardown: teardownCSSClasses
 } );
 asyncTest( "visibility: hidden", function() {
 	expect( 1 );
-	$( "#bg" )
-		.css( { width: 300, height: 300, "background-position": "50% 50%", visibility: "hidden" } )
-		.addClass( "background-image-300x400 background-size-cover" );
+	$( "#bg" ).css( "visibility", "hidden" );
 	polyfillReady( function() {
 		equal( $( "#bg img" ).css( "visibility" ), "hidden", "img is hidden" );
 		start();
@@ -735,9 +738,7 @@ asyncTest( "visibility: hidden", function() {
 } );
 asyncTest( "zero width", function() {
 	expect( 1 );
-	$( "#bg" )
-		.css( { width: 0, height: 300, "background-position": "50% 50%" } )
-		.addClass( "background-image-300x400 background-size-cover" );
+	$( "#bg" ).css( "width", 0 );
 	polyfillReady( function() {
 		equal( $( "#bg img" ).css( "display" ), "none", "img is hidden" );
 		start();
@@ -745,14 +746,27 @@ asyncTest( "zero width", function() {
 } );
 asyncTest( "zero height", function() {
 	expect( 1 );
-	$( "#bg" )
-		.css( { width: 300, height: 0, "background-position": "50% 50%" } )
-		.addClass( "background-image-300x400 background-size-cover" );
+	$( "#bg" ).css( "height", 0 );
+	polyfillReady( function() {
+		equal( $( "#bg img" ).css( "display" ), "none", "img is hidden" );
+		start();
+	} );
+} );
+asyncTest( "no background image", function() {
+	expect( 1 );
+	$( "#bg" ).removeClass( "background-image-300x400" );
+	polyfillReady( function() {
+		equal( $( "#bg img" ).css( "display" ), "none", "img is hidden" );
+		start();
+	} );
+} );
+asyncTest( "background image missing", function() {
+	expect( 1 );
+	$( "#bg" ).css( "background-image", "url(i-dont-exist.jpg)" );
 	polyfillReady( function() {
 		equal( $( "#bg img" ).css( "display" ), "none", "img is hidden" );
 		start();
 	} );
 } );
 
-// image 404
 // clone element

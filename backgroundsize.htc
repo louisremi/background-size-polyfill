@@ -358,7 +358,15 @@ function getImageDimensions( src, callback ) {
 		img = doc.createElement( "img" );
 
 		img.onload = img.onerror = function() {
-			callback( img.width, img.height );
+			var width = img.width,
+				height = img.height;
+
+			if ( window.event.type == "error" ) {
+				width = height = 0;
+			}
+
+			callback( width, height );
+
 			img = img.onload = img.onerror = null;
 		};
 

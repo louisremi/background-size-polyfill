@@ -1,6 +1,6 @@
 var o; // and so it is
 
-(function( element, spacerPath ) {
+(function( element, window ) {
 
 var rsrc = /url\(["']?(.*?)["']?\)/,
 	positions = {
@@ -10,7 +10,6 @@ var rsrc = /url\(["']?(.*?)["']?\)/,
 		right: 1,
 		center: 0.5
 	},
-	doc = element.document,
 	spacer = "data:image/gif;base64,R0lGODlhAQABAIABAP///wAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==",
 	noop = function() {},
 	resizeInterval = 100,
@@ -20,8 +19,8 @@ var rsrc = /url\(["']?(.*?)["']?\)/,
 
 // remove the background-image and emulate it with a wrapped <img/>
 function init() {
-	var wrapper = doc.createElement( "div" ),
-		img = doc.createElement( "img" ),
+	var wrapper = window.document.createElement( "div" ),
+		img = window.document.createElement( "img" ),
 		wrapperStyle = wrapper.style,
 		elementStyle = element.style,
 		elementCurrentStyle = element.currentStyle,
@@ -74,7 +73,7 @@ function init() {
 	// check if browser supports our data uri spacer gif
 	getImageDimensions( expando, spacer, function( width, height ) {
 		if ( width !== 1 || height !== 1 ) {
-			spacer = spacerPath;
+			spacer = window.bgsSpacerGif;
 		}
 
 		o = {
@@ -120,7 +119,7 @@ function getImageDimensions( expando, src, callback ) {
 	var img;
 
 	if ( src ) {
-		img = doc.createElement( "img" );
+		img = window.document.createElement( "img" );
 		img.onload = img.onerror = function() {
 			var width = this.width,
 				height = this.height;
@@ -399,7 +398,7 @@ function restore() {
 
 	} catch ( e ) {}
 
-	element = spacerPath = doc = null;
+	element = window = null;
 }
 
 // don't allow anything until init() is called
@@ -414,4 +413,4 @@ if ( element.readyState === "complete" ) {
 	init();
 }
 
-})( element, window.bgsSpacerGif );
+})( element, window );

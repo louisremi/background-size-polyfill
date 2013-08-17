@@ -5,27 +5,26 @@ module.exports = function( grunt ) {
 	// Project configuration
 	grunt.initConfig( {
 		pkg: grunt.file.readJSON( "package.json" ),
+		jsonlint: {
+			pkg: {
+				src: [ "package.json" ]
+			}
+		},
 		jshint: {
 			grunt: {
-				files: {
-					src: [ "Gruntfile.js" ]
-				},
+				src: [ "Gruntfile.js" ],
 				options: {
 					jshintrc: ".jshintrc"
 				}
 			},
 			build: {
-				files: {
-					src: [ "src/script.js" ]
-				},
+				src: [ "src/script.js" ],
 				options: {
 					jshintrc: "src/.jshintrc"
 				}
 			},
 			test: {
-				files: {
-					src: [ "test/test.js" ]
-				},
+				src: [ "test/test.js" ],
 				options: {
 					jshintrc: "test/.jshintrc"
 				}
@@ -68,6 +67,7 @@ module.exports = function( grunt ) {
 	} );
 
 	// Load tasks from NPM packages
+	grunt.loadNpmTasks( "grunt-jsonlint" );
 	grunt.loadNpmTasks( "grunt-contrib-jshint" );
 	grunt.loadNpmTasks( "grunt-contrib-concat" );
 	grunt.loadNpmTasks( "grunt-contrib-uglify" );
@@ -76,6 +76,6 @@ module.exports = function( grunt ) {
 	grunt.registerTask( "build", [ "jshint", "concat:build" ] );
 
 	// Default task(s)
-	grunt.registerTask( "default", [ "build", "uglify:dist", "concat:dist" ] );
+	grunt.registerTask( "default", [ "jsonlint", "build", "uglify:dist", "concat:dist" ] );
 
 };

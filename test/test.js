@@ -556,7 +556,6 @@ asyncTest( "background-image, no background, inline image", function() {
 	var div = $( "#bg" );
 
 	polyfillReady( function() {
-		var img = div.find( "img" );
 		equal( div.find( "img" ).css( "display" ), "none", "verify img is hidden before test" );
 
 		onbackgroundupdate( function() {
@@ -653,7 +652,6 @@ asyncTest( "background-image, add class", function() {
 	var div = $( "#bg" );
 
 	polyfillReady( function() {
-		var img = div.find( "img" );
 		equal( div.find( "img" ).css( "display" ), "none", "verify img is hidden before test" );
 
 		onbackgroundupdate( function() {

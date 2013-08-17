@@ -1,7 +1,6 @@
 {
 	"curly": true,
 	"eqeqeq": true,
-	"es3": true,
 	"immed": true,
 	"latedef": true,
 	"newcap": true,
@@ -14,13 +13,7 @@
 	"eqnull": true,
 	"smarttabs": true,
 
-	"browser": true,
-	"devel": true,
+	"node": true,
 
-	"onevar": true,
-
-	"globals": {
-		"element": false,
-		"updateEvent": false
-	}
+	"onevar": true
 }

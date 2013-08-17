@@ -1,17 +1,33 @@
 module.exports = function( grunt ) {
 
-	'use strict';
+	"use strict";
 
 	// Project configuration
 	grunt.initConfig( {
 		pkg: grunt.file.readJSON( "package.json" ),
 		jshint: {
+			grunt: {
+				files: {
+					src: [ "Gruntfile.js" ]
+				},
+				options: {
+					jshintrc: ".jshintrc"
+				}
+			},
 			build: {
 				files: {
 					src: [ "src/script.js" ]
 				},
 				options: {
 					jshintrc: "src/.jshintrc"
+				}
+			},
+			test: {
+				files: {
+					src: [ "test/test.js" ]
+				},
+				options: {
+					jshintrc: "test/.jshintrc"
 				}
 			}
 		},
@@ -57,7 +73,7 @@ module.exports = function( grunt ) {
 	grunt.loadNpmTasks( "grunt-contrib-uglify" );
 	grunt.loadNpmTasks( "grunt-git-authors" );
 
-	grunt.registerTask( "build", [ "jshint:build", "concat:build" ] );
+	grunt.registerTask( "build", [ "jshint", "concat:build" ] );
 
 	// Default task(s)
 	grunt.registerTask( "default", [ "build", "uglify:dist", "concat:dist" ] );

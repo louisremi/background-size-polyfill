@@ -83,7 +83,12 @@ module.exports = function( grunt ) {
 			}
 		},
 		watch: {
-			files: [ "<%= jshint.grunt.src %>", "<%= jshint.build.src %>", "<%= jshint.test.src %>" ],
+			files: [
+				"<%= jshint.grunt.src %>",
+				"<%= jshint.build.src %>",
+				"src/*.htc",
+				"<%= jshint.test.src %>"
+			],
 			tasks: "build"
 		}
 	} );

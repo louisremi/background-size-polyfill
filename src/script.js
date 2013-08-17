@@ -15,7 +15,7 @@ var rsrc = /url\(["']?(.*?)["']?\)/,
 	noop = function() {},
 	resizeInterval = 100,
 	resizeId,
-	processSnapshotsId,
+	processSnapshotId,
 	updateEventId;
 
 // remove the background-image and emulate it with a wrapped <img/>
@@ -50,12 +50,13 @@ function init() {
 			position: elementStyle.position,
 			zIndex: elementStyle.zIndex
 		},
-		current: {},    // current snapshot
-		snapshots: [],  // queue of snapshots to process
-		loadImg: null,  // temp img element from getImageDimensions
-		display: null,  // element's display property
-		changed: false, // whether element's display property has changed
-		ignore: false   // whether to ignore the next property change event
+		current: {},       // current snapshot
+		next: null,        // next snapshot to process
+		processing: false, // whether we are in the middle of processing the next snapshot
+		loadImg: null,     // temp img element/object from getImageDimensions
+		display: false,    // element's display property
+		changed: false,    // whether element's display property has changed
+		ignore: false      // whether to ignore the next property change event
 	};
 
 	// This is the part where we mess with the existing DOM
@@ -203,34 +204,28 @@ function takeSnapshot( element, expando ) {
 	return snapshot;
 }
 
-function processSnapshots( element, expando ) {
-	var snapshots = expando.snapshots,
-		snapshot;
+function processSnapshot( element, expando ) {
+	var snapshot = expando.next;
 
-	function next() {
-		processSnapshotsId = setTimeout( function() {
-			snapshots.processing = false;
-			snapshots = snapshot = null;
-			processSnapshots( element, expando );
+	function loop() {
+		processSnapshotId = setTimeout( function() {
+			expando.processing = false;
+			processSnapshot( element, expando );
 		}, 0 );
 	}
 
-	if ( !snapshots.processing && snapshots.length ) {
-		snapshots.processing = true;
-
-		// since each snapshot includes changes all previous snapshots,
-		// we can skip to the last one
-		snapshot = snapshots.pop();
-		snapshots.length = 0;
+	if ( !expando.processing && snapshot ) {
+		expando.next = null;
+		expando.processing = true;
 
 		getImageDimensions( expando, snapshot.src, function( width, height ) {
 			snapshot.imgWidth = width;
 			snapshot.imgHeight = height;
 
 			if ( isChanged( expando, snapshot ) ) {
-				updateBackground( element, expando, snapshot, next );
+				updateBackground( element, expando, snapshot, loop );
 			} else {
-				next();
+				loop();
 			}
 		} );
 	}
@@ -351,8 +346,10 @@ function handlePropertychange() {
 	}
 
 	if ( refreshDisplay( element, expando ) ) {
-		expando.snapshots.push( takeSnapshot( element, expando ) );
-		processSnapshots( element, expando );
+		// since each snapshot includes changes all previous snapshots,
+		// we can replace the old next snapshot with a new one
+		expando.next = takeSnapshot( element, expando );
+		processSnapshot( element, expando );
 	}
 }
 
@@ -375,7 +372,7 @@ function restore() {
 	};
 
 	clearTimeout( resizeId );
-	clearTimeout( processSnapshotsId );
+	clearTimeout( processSnapshotId );
 	clearTimeout( updateEventId );
 
 	try {
@@ -388,7 +385,7 @@ function restore() {
 
 			elementStyle = element.style;
 			expandoRestore = expando.restore;
-			if ( expandoRestore && elementStyle ) {
+			if ( elementStyle ) {
 				elementStyle.backgroundImage = expandoRestore.backgroundImage;
 				elementStyle.position = expandoRestore.position;
 				elementStyle.zIndex = expandoRestore.zIndex;

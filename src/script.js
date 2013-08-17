@@ -122,12 +122,12 @@ function getImageDimensions( expando, src, callback ) {
 	if ( src ) {
 		img = doc.createElement( "img" );
 		img.onload = img.onerror = function() {
-			var width = img.width,
-				height = img.height;
+			var width = this.width,
+				height = this.height;
 			if ( window.event.type === "error" ) {
 				width = height = 0;
 			}
-			expando.loadImg = img = img.onload = img.onerror = null;
+			expando.loadImg = this.onload = this.onerror = null;
 			callback( width, height );
 		};
 		img.src = src;
@@ -135,13 +135,14 @@ function getImageDimensions( expando, src, callback ) {
 	} else {
 		img = {
 			callbackId: setTimeout( function() {
-				expando.loadImg = img = null;
+				expando.loadImg = null;
 				callback( 0, 0 );
 			}, 0 )
 		};
 	}
 
 	expando.loadImg = img;
+	img = null;
 }
 
 // this prevents handling propertychange events caused by this script

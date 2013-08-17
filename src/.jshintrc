@@ -17,5 +17,10 @@
 	"browser": true,
 	"devel": true,
 
-	"onevar": true
+	"onevar": true,
+
+	"globals": {
+		"element": false,
+		"updateEvent": false
+	}
 }

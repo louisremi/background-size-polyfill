@@ -18,12 +18,12 @@ module.exports = function( grunt ) {
 		concat: {
 			build: {
 				files: {
-					"build/backgroundsize.htc": [ "src/intro.htc", "src/script.js", "src/outro.htc" ]
+					"backgroundsize.htc": [ "src/intro.htc", "src/script.js", "src/outro.htc" ]
 				}
 			},
 			dist: {
 				files: {
-					"build/backgroundsize.min.htc": [ "src/intro.htc", "build/script.min.js", "src/outro.min.htc" ]
+					"backgroundsize.min.htc": [ "src/intro.htc", "build/script.min.js", "src/outro.min.htc" ]
 				},
 				options: {
 					separator: ""

@@ -8,7 +8,7 @@ var rsrc = /url\(["']?(.*?)["']?\)/,
 		left: 0,
 		bottom: 1,
 		right: 1,
-		center: .5
+		center: 0.5
 	},
 	doc = element.document,
 	spacer = "data:image/gif;base64,R0lGODlhAQABAIABAP///wAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==",
@@ -17,18 +17,6 @@ var rsrc = /url\(["']?(.*?)["']?\)/,
 	resizeId,
 	processSnapshotsId,
 	updateEventId;
-
-// don't allow anything until init() is called
-o = {
-	init: init,
-	handlePropertychange: noop,
-	restore: noop,
-	handleResize: noop
-};
-
-if ( element.readyState == "complete" ) {
-	init();
-}
 
 // remove the background-image and emulate it with a wrapped <img/>
 function init() {
@@ -72,10 +60,10 @@ function init() {
 
 	// This is the part where we mess with the existing DOM
 	// to make sure that the background image is correctly zIndexed
-	if ( elementCurrentStyle.zIndex == "auto" ) {
+	if ( elementCurrentStyle.zIndex === "auto" ) {
 		elementStyle.zIndex = 0;
 	}
-	if ( elementCurrentStyle.position == "static" ) {
+	if ( elementCurrentStyle.position === "static" ) {
 		elementStyle.position = "relative";
 	}
 
@@ -84,7 +72,7 @@ function init() {
 
 	// check if browser supports our data uri spacer gif
 	getImageDimensions( expando, spacer, function( width, height ) {
-		if ( width != 1 || height != 1 ) {
+		if ( width !== 1 || height !== 1 ) {
 			spacer = spacerPath;
 		}
 
@@ -135,7 +123,7 @@ function getImageDimensions( expando, src, callback ) {
 		img.onload = img.onerror = function() {
 			var width = img.width,
 				height = img.height;
-			if ( window.event.type == "error" ) {
+			if ( window.event.type === "error" ) {
 				width = height = 0;
 			}
 			expando.loadImg = img = img.onload = img.onerror = null;
@@ -166,15 +154,15 @@ function suspendPropertychange( callback ) {
 function refreshDisplay( element, expando ) {
 	var display = element.currentStyle.display;
 
-	if ( display != expando.display ) {
+	if ( display !== expando.display ) {
 		expando.display = display;
 		expando.changed = true;
 	}
 
-	return display != "none";
+	return display !== "none";
 }
 
-function takeSnapshot( element, expando, callback ) {
+function takeSnapshot( element, expando ) {
 	var elementStyle = element.style,
 		elementCurrentStyle = element.currentStyle,
 		expandoRestore = expando.restore,
@@ -183,12 +171,12 @@ function takeSnapshot( element, expando, callback ) {
 			elementCurrentStyle.backgroundPositionY
 		],
 		snapshot = {
-			innerWidth: element.offsetWidth
-				- ( parseFloat( elementCurrentStyle.borderLeftWidth ) || 0 )
-				- ( parseFloat( elementCurrentStyle.borderRightWidth ) || 0 ),
-			innerHeight: element.offsetHeight
-				- ( parseFloat( elementCurrentStyle.borderTopWidth ) || 0 )
-				- ( parseFloat( elementCurrentStyle.borderBottomWidth ) || 0 ),
+			innerWidth: element.offsetWidth -
+				( parseFloat( elementCurrentStyle.borderLeftWidth ) || 0 ) -
+				( parseFloat( elementCurrentStyle.borderRightWidth ) || 0 ),
+			innerHeight: element.offsetHeight -
+				( parseFloat( elementCurrentStyle.borderTopWidth ) || 0 ) -
+				( parseFloat( elementCurrentStyle.borderBottomWidth ) || 0 ),
 			size: elementCurrentStyle["background-size"],
 			// Only keywords or percentage values are supported
 			posX: positions[ pos[0] ] || parseFloat( pos[0] ) / 100 || 0,
@@ -198,7 +186,7 @@ function takeSnapshot( element, expando, callback ) {
 			imgHeight: 0
 		};
 
-	if ( ( rsrc.exec( elementStyle.backgroundImage ) || [] )[1] == spacer ) {
+	if ( ( rsrc.exec( elementStyle.backgroundImage ) || [] )[1] === spacer ) {
 		suspendPropertychange( function() {
 			elementStyle.backgroundImage = expandoRestore.backgroundImage;
 		} );
@@ -260,7 +248,7 @@ function isChanged( expando, snapshot ) {
 
 	} else {
 		for ( prop in snapshot ) {
-			if ( snapshot[prop] != expandoCurrent[prop] ) {
+			if ( snapshot[prop] !== expandoCurrent[prop] ) {
 				changed = true;
 				break;
 			}
@@ -292,7 +280,7 @@ function updateBackground( element, expando, snapshot, callback ) {
 		elemRatio = innerWidth / innerHeight;
 		imgRatio = imgWidth / imgHeight;
 
-		if ( snapshot.size == "contain" ) {
+		if ( snapshot.size === "contain" ) {
 			if ( imgRatio > elemRatio ) {
 				delta = Math.floor( ( innerHeight - innerWidth / imgRatio ) * posY );
 
@@ -307,7 +295,7 @@ function updateBackground( element, expando, snapshot, callback ) {
 				height = "100%";
 			}
 
-		} else if ( snapshot.size == "cover" ) {
+		} else if ( snapshot.size === "cover" ) {
 			if ( imgRatio > elemRatio ) {
 				delta = Math.floor( ( innerHeight * imgRatio - innerWidth ) * posX );
 
@@ -349,7 +337,7 @@ function handlePropertychange() {
 
 	if ( expando.ignore ) {
 		expando.ignore = false;
-		if ( propertyName == "style.backgroundImage" ) {
+		if ( propertyName === "style.backgroundImage" ) {
 			return;
 		}
 	}
@@ -358,7 +346,7 @@ function handlePropertychange() {
 	// and its value is set to a non-empty string,
 	// then the propertychange event will be fired twice
 	// http://blog.csdn.net/hax/article/details/1346542
-	if ( propertyName == "style.backgroundImage" && element.style.backgroundImage ) {
+	if ( propertyName === "style.backgroundImage" && element.style.backgroundImage ) {
 		expando.ignore = true;
 	}
 
@@ -376,8 +364,8 @@ function handleResize() {
 function restore() {
 	var expando = element.bgsExpando,
 		loadImg,
-		style,
-		restore;
+		elementStyle,
+		expandoRestore;
 
 	o = {
 		init: noop,
@@ -398,12 +386,12 @@ function restore() {
 				clearTimeout( loadImg.callbackId );
 			}
 
-			style = element.style;
-			restore = expando.restore;
-			if ( restore && style ) {
-				style.backgroundImage = restore.backgroundImage;
-				style.position = restore.position;
-				style.zIndex = restore.zIndex;
+			elementStyle = element.style;
+			expandoRestore = expando.restore;
+			if ( expandoRestore && elementStyle ) {
+				elementStyle.backgroundImage = expandoRestore.backgroundImage;
+				elementStyle.position = expandoRestore.position;
+				elementStyle.zIndex = expandoRestore.zIndex;
 			}
 
 			element.removeChild( expando.wrapper );
@@ -414,6 +402,18 @@ function restore() {
 	} catch ( e ) {}
 
 	element = spacerPath = doc = null;
+}
+
+// don't allow anything until init() is called
+o = {
+	init: init,
+	handlePropertychange: noop,
+	restore: noop,
+	handleResize: noop
+};
+
+if ( element.readyState === "complete" ) {
+	init();
 }
 
 })( element, window.bgsSpacerGif );

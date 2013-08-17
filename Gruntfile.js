@@ -2,6 +2,8 @@ module.exports = function( grunt ) {
 
 	"use strict";
 
+	var gzip = require( "gzip-js" );
+
 	// Project configuration
 	grunt.initConfig( {
 		pkg: grunt.file.readJSON( "package.json" ),
@@ -63,6 +65,21 @@ module.exports = function( grunt ) {
 					}
 				},
 			}
+		},
+		compare_size: {
+			files: [ "backgroundsize.htc", "backgroundsize.min.htc" ],
+			options: {
+				compress: {
+					gz: function( contents ) {
+						return gzip.zip( contents, {} ).length;
+					}
+				},
+				cache: "build/.sizecache.json"
+			}
+		},
+		watch: {
+			files: [ "<%= jshint.grunt.src %>", "<%= jshint.build.src %>", "<%= jshint.test.src %>" ],
+			tasks: "build"
 		}
 	} );
 
@@ -71,11 +88,13 @@ module.exports = function( grunt ) {
 	grunt.loadNpmTasks( "grunt-contrib-jshint" );
 	grunt.loadNpmTasks( "grunt-contrib-concat" );
 	grunt.loadNpmTasks( "grunt-contrib-uglify" );
+	grunt.loadNpmTasks( "grunt-compare-size" );
+	grunt.loadNpmTasks( "grunt-contrib-watch" );
 	grunt.loadNpmTasks( "grunt-git-authors" );
 
 	grunt.registerTask( "build", [ "jshint", "concat:build" ] );
 
 	// Default task(s)
-	grunt.registerTask( "default", [ "jsonlint", "build", "uglify:dist", "concat:dist" ] );
+	grunt.registerTask( "default", [ "jsonlint", "build", "uglify:dist", "concat:dist", "compare_size" ] );
 
 };

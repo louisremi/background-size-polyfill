@@ -3,7 +3,11 @@
 	"description": "Adds support for background-size \"cover\" and \"contain\" to IE8",
 	"version": "0.1.0",
 	"homepage": "http://louisremi.github.com/background-size-polyfill/",
-	"author": "Louis-Rémi Babé <public@lrbabe.com> (https://github.com/louisremi)",
+	"author": {
+		"name": "Louis-Rémi Babé",
+		"email": "public@lrbabe.com",
+		"url": "https://github.com/louisremi"
+	},
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/louisremi/background-size-polyfill.git"

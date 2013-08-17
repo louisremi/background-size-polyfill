@@ -33,6 +33,11 @@ module.exports = function( grunt ) {
 			}
 		},
 		concat: {
+			options: {
+				banner: "<!-- <%= pkg.name %> v<%= pkg.version %> | " +
+					"(c) 2012-2013 <%= pkg.author.name %> | " +
+					"MIT License -->\n"
+			},
 			build: {
 				files: {
 					"backgroundsize.htc": [ "src/intro.htc", "src/script.js", "src/outro.htc" ]

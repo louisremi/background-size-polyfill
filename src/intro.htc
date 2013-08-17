@@ -1,0 +1,8 @@
+<PUBLIC:COMPONENT lightWeight="true">
+<PUBLIC:ATTACH EVENT="oncontentready" ONEVENT="o.init()" />
+<PUBLIC:ATTACH EVENT="ondocumentready" ONEVENT="o.init()" />
+<PUBLIC:ATTACH EVENT="onpropertychange" ONEVENT="o.handlePropertychange()" />
+<PUBLIC:ATTACH EVENT="ondetach" ONEVENT="o.restore()" />
+<PUBLIC:ATTACH EVENT="onresize" FOR="window" ONEVENT="o.handleResize()" />
+<PUBLIC:EVENT NAME="onbackgroundupdate" ID="updateEvent" />
+<script type="text/javascript">

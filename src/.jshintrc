@@ -1,0 +1,21 @@
+{
+	"curly": true,
+	"eqeqeq": true,
+	"es3": true,
+	"immed": true,
+	"latedef": true,
+	"newcap": true,
+	"noarg": true,
+	"quotmark": "double",
+	"undef": true,
+	"unused": true,
+	"trailing": true,
+
+	"eqnull": true,
+	"smarttabs": true,
+
+	"browser": true,
+	"devel": true,
+
+	"onevar": true
+}

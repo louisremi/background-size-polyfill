@@ -40,12 +40,20 @@ module.exports = function( grunt ) {
 			},
 			build: {
 				files: {
-					"backgroundsize.htc": [ "src/intro.htc", "src/script.js", "src/outro.htc" ]
+					"backgroundsize.htc": [
+						"src/intro.htc",
+						"src/script.js",
+						"src/outro.htc"
+					]
 				}
 			},
 			dist: {
 				files: {
-					"backgroundsize.min.htc": [ "src/intro.htc", "build/script.min.js", "src/outro.min.htc" ]
+					"backgroundsize.min.htc": [
+						"src/intro.htc",
+						"build/script.min.js",
+						"src/outro.min.htc"
+					]
 				},
 				options: {
 					separator: ""
@@ -72,7 +80,10 @@ module.exports = function( grunt ) {
 			}
 		},
 		compare_size: {
-			files: [ "backgroundsize.htc", "backgroundsize.min.htc" ],
+			files: [
+				"backgroundsize.htc",
+				"backgroundsize.min.htc"
+			],
 			options: {
 				compress: {
 					gz: function( contents ) {
@@ -102,9 +113,18 @@ module.exports = function( grunt ) {
 	grunt.loadNpmTasks( "grunt-contrib-watch" );
 	grunt.loadNpmTasks( "grunt-git-authors" );
 
-	grunt.registerTask( "build", [ "jshint", "concat:build" ] );
+	grunt.registerTask( "build", [
+		"jshint",
+		"concat:build"
+	] );
 
 	// Default task(s)
-	grunt.registerTask( "default", [ "jsonlint", "build", "uglify:dist", "concat:dist", "compare_size" ] );
+	grunt.registerTask( "default", [
+		"jsonlint",
+		"build",
+		"uglify:dist",
+		"concat:dist",
+		"compare_size"
+	] );
 
 };

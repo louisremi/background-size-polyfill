@@ -15,7 +15,7 @@ var rsrc = /url\(["']?(.*?)["']?\)/,
 	resizeInterval = 100,
 	resizeId,
 	processSnapshotId,
-	updateEventId;
+	updateBackgroundCallbackId;
 
 // remove the background-image and emulate it with a wrapped <img/>
 function init() {
@@ -319,10 +319,11 @@ function updateBackground( element, expando, snapshot, callback ) {
 
 	expando.current = snapshot;
 
-	updateEventId = setTimeout( function() {
-		updateEvent.fire();
-		callback();
-	}, 0 );
+	updateBackgroundCallbackId = setTimeout( callback, 0 );
+
+	// if any properties are changed here, processSnapshot() will process them later
+	// if ondetach is triggered, updateBackgroundCallbackId will be cleared
+	updateEvent.fire();
 }
 
 // handle different style changes
@@ -373,7 +374,7 @@ function restore() {
 
 	clearTimeout( resizeId );
 	clearTimeout( processSnapshotId );
-	clearTimeout( updateEventId );
+	clearTimeout( updateBackgroundCallbackId );
 
 	try {
 		if ( expando ) {

@@ -26,8 +26,11 @@ function setupCSSClasses() {
 
 function teardownCSSClasses() { $( "#customCSSClasses" ).remove(); }
 
-function onbackgroundupdate( callback ) {
-	var el = $( "#bg" )[0];
+function onbackgroundupdate( el, callback ) {
+	if ( !callback ) {
+		callback = el;
+		el = $( "#bg" )[0];
+	}
 
 	el.onbackgroundupdate = function () {
 		el.onbackgroundupdate = null;
@@ -45,24 +48,25 @@ window.bgsSpacerGif = "../spacer.gif";
 
 
 module( "general", {
-	setup: setupCSSClasses,
+	setup: function() {
+		setupCSSClasses();
+		$( "#bg" )
+			.append( "<span></span>" )
+			.css( {
+				position: "static",
+				width: 800,
+				height: 600
+			} )
+			.addClass( "background-size-cover" );
+	},
 	teardown: teardownCSSClasses
 } );
-
-asyncTest( "setup and teardown", function() {
-	expect( 10 );
+asyncTest( "setup", function() {
+	expect( 5 );
 
 	var div = $( "#bg" ), url = getUrl( "800x600" );
 
-	div
-		.append( "<span></span>" )
-		.css( {
-			position: "static",
-			"background-image": url,
-			width: 800,
-			height: 600
-		} )
-		.addClass( "background-size-cover" );
+	div.css( "background-image", url );
 
 	polyfillReady( function() {
 		var children = div.children(),
@@ -74,6 +78,24 @@ asyncTest( "setup and teardown", function() {
 		equal( grandchildren.length, 1, "one child appended to wrapper" );
 		equal( ( grandchildren.prop( "nodeName" ) || "" ).toUpperCase(), "IMG", "img appended to wrapper" );
 		ok( isUrl( "800x600", grandchildren.prop( "src" ) ), "img has correct src" );
+
+		start();
+	} );
+} );
+asyncTest( "teardown", function() {
+	expect( 7 );
+
+	var div = $( "#bg" ), url = getUrl( "800x600" );
+
+	div.css( "background-image", url );
+
+	polyfillReady( function() {
+		var children = div.children(),
+			first = children.first(),
+			grandchildren = first.children();
+
+		equal( children.length, 2, "verify wrapper appended to element before test" );
+		ok( isUrl( "800x600", grandchildren.prop( "src" ) ), "verify img has correct src before test" );
 
 		div.removeClass( "polyfill" );
 
@@ -767,4 +789,88 @@ asyncTest( "background image missing", function() {
 	} );
 } );
 
-// clone element
+
+
+/*module( "clone element", {
+	setup: function() {
+		setupCSSClasses();
+		$( "#bg" )
+			.css( { width: 300, height: 300, "background-position": "50% 50%" } )
+			.addClass( "background-image-300x400 background-size-cover" );
+		stop();
+		polyfillReady(start);
+	},
+	teardown: teardownCSSClasses
+} );
+asyncTest( "cloneNode(false)", function() {
+	expect( 4 );
+	var div = $( "#bg" ),
+		clone = $( div[0].cloneNode( false ) );
+	clone.prop( "id", "clone" );
+console.log(clone[0].bgsExpando === div[0].bgsExpando);
+	onbackgroundupdate( clone[0], function() {
+		var img = div.find( "img" ),
+			cloneimg = clone.find( "img" );
+console.log(clone.html());
+		equal( cloneimg.width(), img.width(), "correct width" );
+		equal( cloneimg.height(), img.height(), "correct height" );
+		deepEqual( cloneimg.position(), img.position(), "correct position" );
+		equal( cloneimg.prop( "src" ), img.prop( "src" ), "correct img src" );
+		start();
+	} );
+	clone.insertAfter( div );
+} );
+asyncTest( "cloneNode(true)", function() {
+	expect( 4 );
+	var div = $( "#bg" ),
+		clone = $( div[0].cloneNode( true ) );
+	clone.prop( "id", "clone" );
+console.log(clone[0].bgsExpando === div[0].bgsExpando);
+	onbackgroundupdate( clone[0], function() {
+		var img = div.find( "img" ),
+			cloneimg = clone.find( "img" );
+console.log(clone.html());
+		equal( cloneimg.width(), img.width(), "correct width" );
+		equal( cloneimg.height(), img.height(), "correct height" );
+		deepEqual( cloneimg.position(), img.position(), "correct position" );
+		equal( cloneimg.prop( "src" ), img.prop( "src" ), "correct img src" );
+		start();
+	} );
+	clone.insertAfter( div );
+} );
+asyncTest( "jQuery.clone()", function() {
+	expect( 4 );
+	var div = $( "#bg" ),
+		clone = div.clone();
+	clone.prop( "id", "clone" );
+console.log(clone[0].bgsExpando === div[0].bgsExpando);
+	onbackgroundupdate( clone[0], function() {
+		var img = div.find( "img" ),
+			cloneimg = clone.find( "img" );
+console.log(clone.html());
+		equal( cloneimg.width(), img.width(), "correct width" );
+		equal( cloneimg.height(), img.height(), "correct height" );
+		deepEqual( cloneimg.position(), img.position(), "correct position" );
+		equal( cloneimg.prop( "src" ), img.prop( "src" ), "correct img src" );
+		start();
+	} );
+	clone.insertAfter( div );
+} );
+asyncTest( "jQuery.clone( true )", function() {
+	expect( 4 );
+	var div = $( "#bg" ),
+		clone = div.clone( true );
+	clone.prop( "id", "clone" );
+console.log(clone[0].bgsExpando === div[0].bgsExpando);
+	onbackgroundupdate( clone[0], function() {
+		var img = div.find( "img" ),
+			cloneimg = clone.find( "img" );
+console.log(clone.html());
+		equal( cloneimg.width(), img.width(), "correct width" );
+		equal( cloneimg.height(), img.height(), "correct height" );
+		deepEqual( cloneimg.position(), img.position(), "correct position" );
+		equal( cloneimg.prop( "src" ), img.prop( "src" ), "correct img src" );
+		start();
+	} );
+	clone.insertAfter( div );
+} );*/

@@ -21,22 +21,46 @@ var rsrc = /url\(["']?(.*?)["']?\)/,
 		center: 0.5
 	},
 	spacer = "data:image/gif;base64,R0lGODlhAQABAIABAP///wAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==",
+	wrapperClass = "background-size-polyfill",
 	noop = function() {},
 	resizeInterval = 100,
 	resizeId,
 	processSnapshotId,
+	updateEventId,
 	updateBackgroundCallbackId;
 
 // remove the background-image and emulate it with a wrapped <img/>
 function init() {
-	var wrapper = window.document.createElement( "div" ),
-		img = window.document.createElement( "img" ),
-		wrapperStyle = wrapper.style,
+	var expando = element.bgsExpando,
 		elementStyle = element.style,
 		elementCurrentStyle = element.currentStyle,
-		expando;
+		wrapper = element.firstChild,
+		img = ( wrapper || {} ).firstChild,
+		wrapperStyle;
+
+	if ( expando && expando.restore ) {
+		elementStyle.backgroundImage = expando.restore.backgroundImage;
+		elementStyle.position = expando.restore.position;
+		elementStyle.zIndex = expando.restore.zIndex;
+	}
+
+	if ( !expando ||
+			!wrapper ||
+			( wrapper.nodeName || "" ).toUpperCase() !== "DIV" ||
+			wrapper.className !== wrapperClass ||
+			wrapper.childNodes.length !== 1 ||
+			!img ||
+			( img.nodeName || "" ).toUpperCase() !== "IMG" ) {
+		wrapper = window.document.createElement( "div" );
+		img = window.document.createElement( "img" );
+
+		wrapper.className = wrapperClass;
+		wrapper.appendChild( img );
+		element.insertBefore( wrapper, element.firstChild );
+	}
 
 	setStyles( wrapper );
+	wrapperStyle = wrapper.style;
 	wrapperStyle.top =
 		wrapperStyle.right =
 		wrapperStyle.bottom =
@@ -44,10 +68,6 @@ function init() {
 
 	setStyles( img );
 	img.alt = "";
-
-	wrapper.appendChild( img );
-
-	element.insertBefore( wrapper, element.firstChild );
 
 	// save useful data for quick access
 	element.bgsExpando = expando = {
@@ -277,6 +297,8 @@ function updateBackground( element, expando, snapshot, callback ) {
 		top = 0,
 		width = "auto",
 		height = "auto",
+		px = "px",
+		oneHundredPercent = "100%",
 		elemRatio,
 		imgRatio,
 		delta;
@@ -289,30 +311,30 @@ function updateBackground( element, expando, snapshot, callback ) {
 			if ( imgRatio > elemRatio ) {
 				delta = Math.floor( ( innerHeight - innerWidth / imgRatio ) * posY );
 
-				top = delta + "px";
-				width = "100%";
+				top = delta + px;
+				width = oneHundredPercent;
 
 			// elemRatio > imgRatio
 			} else {
 				delta = Math.floor( ( innerWidth - innerHeight * imgRatio ) * posX );
 
-				left = delta + "px";
-				height = "100%";
+				left = delta + px;
+				height = oneHundredPercent;
 			}
 
 		} else if ( snapshot.size === "cover" ) {
 			if ( imgRatio > elemRatio ) {
 				delta = Math.floor( ( innerHeight * imgRatio - innerWidth ) * posX );
 
-				left = -delta + "px";
-				height = "100%";
+				left = -delta + px;
+				height = oneHundredPercent;
 
 			// elemRatio > imgRatio
 			} else {
 				delta = Math.floor( ( innerWidth / imgRatio - innerHeight ) * posY );
 
-				top = -delta + "px";
-				width = "100%";
+				top = -delta + px;
+				width = oneHundredPercent;
 			}
 		}
 
@@ -329,21 +351,27 @@ function updateBackground( element, expando, snapshot, callback ) {
 
 	expando.current = snapshot;
 
-	updateBackgroundCallbackId = window.setTimeout( callback, 0 );
+	// img onload may be called synchronously, leading to us trying to
+	// fire onbackgroundupdate within init(), causing an error
+	// so wrap it with setTimeout()
+	updateEventId = window.setTimeout( function() {
+		updateBackgroundCallbackId = window.setTimeout( callback, 0 );
 
-	// if any properties are changed here, processSnapshot() will process them later
-	// if ondetach is triggered, updateBackgroundCallbackId will be cleared
-	updateEvent.fire();
+		// if any properties are changed here, processSnapshot() will process them later
+		// if ondetach is triggered, updateBackgroundCallbackId will be cleared
+		updateEvent.fire();
+	}, 0 );
 }
 
 // handle different style changes
 function handlePropertychange() {
 	var expando = element.bgsExpando,
-		propertyName = ( window.event || {} ).propertyName;
+		propertyName = ( window.event || {} ).propertyName,
+		backgroundImageProperty = "style.backgroundImage";
 
 	if ( expando.ignore ) {
 		expando.ignore = false;
-		if ( propertyName === "style.backgroundImage" ) {
+		if ( propertyName === backgroundImageProperty ) {
 			return;
 		}
 	}
@@ -352,7 +380,7 @@ function handlePropertychange() {
 	// and its value is set to a non-empty string,
 	// then the propertychange event will be fired twice
 	// http://blog.csdn.net/hax/article/details/1346542
-	if ( propertyName === "style.backgroundImage" && element.style.backgroundImage ) {
+	if ( propertyName === backgroundImageProperty && element.style.backgroundImage ) {
 		expando.ignore = true;
 	}
 
@@ -384,6 +412,7 @@ function restore() {
 
 	window.clearTimeout( resizeId );
 	window.clearTimeout( processSnapshotId );
+	window.clearTimeout( updateEventId );
 	window.clearTimeout( updateBackgroundCallbackId );
 
 	try {

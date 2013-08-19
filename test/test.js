@@ -796,7 +796,7 @@ asyncTest( "background image missing", function() {
 
 
 
-/*module( "clone element", {
+module( "clone element", {
 	setup: function() {
 		setupCSSClasses();
 		$( "#bg" )
@@ -812,11 +812,11 @@ asyncTest( "cloneNode(false)", function() {
 	var div = $( "#bg" ),
 		clone = $( div[0].cloneNode( false ) );
 	clone.prop( "id", "clone" );
-console.log(clone[0].bgsExpando === div[0].bgsExpando);
+
 	onbackgroundupdate( clone[0], function() {
 		var img = div.find( "img" ),
 			cloneimg = clone.find( "img" );
-console.log(clone.html());
+
 		equal( cloneimg.width(), img.width(), "correct width" );
 		equal( cloneimg.height(), img.height(), "correct height" );
 		deepEqual( cloneimg.position(), img.position(), "correct position" );
@@ -830,11 +830,11 @@ asyncTest( "cloneNode(true)", function() {
 	var div = $( "#bg" ),
 		clone = $( div[0].cloneNode( true ) );
 	clone.prop( "id", "clone" );
-console.log(clone[0].bgsExpando === div[0].bgsExpando);
+
 	onbackgroundupdate( clone[0], function() {
 		var img = div.find( "img" ),
 			cloneimg = clone.find( "img" );
-console.log(clone.html());
+
 		equal( cloneimg.width(), img.width(), "correct width" );
 		equal( cloneimg.height(), img.height(), "correct height" );
 		deepEqual( cloneimg.position(), img.position(), "correct position" );
@@ -848,11 +848,11 @@ asyncTest( "jQuery.clone()", function() {
 	var div = $( "#bg" ),
 		clone = div.clone();
 	clone.prop( "id", "clone" );
-console.log(clone[0].bgsExpando === div[0].bgsExpando);
+
 	onbackgroundupdate( clone[0], function() {
 		var img = div.find( "img" ),
 			cloneimg = clone.find( "img" );
-console.log(clone.html());
+
 		equal( cloneimg.width(), img.width(), "correct width" );
 		equal( cloneimg.height(), img.height(), "correct height" );
 		deepEqual( cloneimg.position(), img.position(), "correct position" );
@@ -866,11 +866,11 @@ asyncTest( "jQuery.clone( true )", function() {
 	var div = $( "#bg" ),
 		clone = div.clone( true );
 	clone.prop( "id", "clone" );
-console.log(clone[0].bgsExpando === div[0].bgsExpando);
+
 	onbackgroundupdate( clone[0], function() {
 		var img = div.find( "img" ),
 			cloneimg = clone.find( "img" );
-console.log(clone.html());
+
 		equal( cloneimg.width(), img.width(), "correct width" );
 		equal( cloneimg.height(), img.height(), "correct height" );
 		deepEqual( cloneimg.position(), img.position(), "correct position" );
@@ -878,4 +878,4 @@ console.log(clone.html());
 		start();
 	} );
 	clone.insertAfter( div );
-} );*/
+} );

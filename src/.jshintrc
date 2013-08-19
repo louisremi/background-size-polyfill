@@ -14,13 +14,11 @@
 	"eqnull": true,
 	"smarttabs": true,
 
-	"browser": true,
-	"devel": true,
-
 	"onevar": true,
 
 	"globals": {
 		"element": false,
+		"window": false,
 		"updateEvent": false
 	}
 }

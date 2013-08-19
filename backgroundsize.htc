@@ -143,7 +143,7 @@ function getImageDimensions( expando, src, callback ) {
 
 	} else {
 		img = {
-			callbackId: setTimeout( function() {
+			callbackId: window.setTimeout( function() {
 				expando.loadImg = null;
 				callback( 0, 0 );
 			}, 0 )
@@ -218,7 +218,7 @@ function processSnapshot( element, expando ) {
 	var snapshot = expando.next;
 
 	function loop() {
-		processSnapshotId = setTimeout( function() {
+		processSnapshotId = window.setTimeout( function() {
 			expando.processing = false;
 			processSnapshot( element, expando );
 		}, 0 );
@@ -329,7 +329,7 @@ function updateBackground( element, expando, snapshot, callback ) {
 
 	expando.current = snapshot;
 
-	updateBackgroundCallbackId = setTimeout( callback, 0 );
+	updateBackgroundCallbackId = window.setTimeout( callback, 0 );
 
 	// if any properties are changed here, processSnapshot() will process them later
 	// if ondetach is triggered, updateBackgroundCallbackId will be cleared
@@ -365,8 +365,8 @@ function handlePropertychange() {
 }
 
 function handleResize() {
-	clearTimeout( resizeId );
-	resizeId = setTimeout( handlePropertychange, resizeInterval );
+	window.clearTimeout( resizeId );
+	resizeId = window.setTimeout( handlePropertychange, resizeInterval );
 }
 
 function restore() {
@@ -382,16 +382,16 @@ function restore() {
 		handleResize: noop
 	};
 
-	clearTimeout( resizeId );
-	clearTimeout( processSnapshotId );
-	clearTimeout( updateBackgroundCallbackId );
+	window.clearTimeout( resizeId );
+	window.clearTimeout( processSnapshotId );
+	window.clearTimeout( updateBackgroundCallbackId );
 
 	try {
 		if ( expando ) {
 			loadImg = expando.loadImg;
 			if ( loadImg ) {
 				loadImg.onload = loadImg.onerror = null;
-				clearTimeout( loadImg.callbackId );
+				window.clearTimeout( loadImg.callbackId );
 			}
 
 			elementStyle = element.style;

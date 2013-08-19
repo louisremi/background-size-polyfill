@@ -27,13 +27,18 @@ function setupCSSClasses() {
 function teardownCSSClasses() { $( "#customCSSClasses" ).remove(); }
 
 function onbackgroundupdate( el, callback ) {
+	var timeoutId;
+
 	if ( !callback ) {
 		callback = el;
 		el = $( "#bg" )[0];
 	}
 
+	timeoutId = setTimeout( callback, 1000 );
+
 	el.onbackgroundupdate = function () {
 		el.onbackgroundupdate = null;
+		clearTimeout( timeoutId );
 		callback();
 	};
 }

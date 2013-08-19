@@ -12,6 +12,7 @@ Changes
 - Added debouncing of window resize events (alternative implementation of louisremi#17)  
 - Added support for cloning polyfilled elements (louisremi#2)  
 - Fixed JS error when using `left` or `top` for `background-position` (louisremi#14)  
+- Fixed JS error when printing  
 - Use standard HTC XML tags (louisremi#10)  
 - Work around IE hang on unload when the JScript portion is greater than 512 bytes  
 - Added unit tests  

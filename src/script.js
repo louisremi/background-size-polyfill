@@ -10,6 +10,7 @@ var rsrc = /url\(["']?(.*?)["']?\)/,
 		right: 1,
 		center: 0.5
 	},
+	doc = element.document,
 	spacer = "data:image/gif;base64,R0lGODlhAQABAIABAP///wAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==",
 	wrapperClass = "background-size-polyfill",
 	noop = function() {},
@@ -41,8 +42,8 @@ function init() {
 			wrapper.childNodes.length !== 1 ||
 			!img ||
 			( img.nodeName || "" ).toUpperCase() !== "IMG" ) {
-		wrapper = window.document.createElement( "div" );
-		img = window.document.createElement( "img" );
+		wrapper = doc.createElement( "div" );
+		img = doc.createElement( "img" );
 
 		wrapper.className = wrapperClass;
 		wrapper.appendChild( img );
@@ -139,7 +140,7 @@ function getImageDimensions( expando, src, callback ) {
 	var img;
 
 	if ( src ) {
-		img = window.document.createElement( "img" );
+		img = doc.createElement( "img" );
 		img.onload = img.onerror = function() {
 			var width = this.width,
 				height = this.height;
@@ -428,19 +429,20 @@ function restore() {
 
 	} catch ( e ) {}
 
-	element = window = null;
+	element = window = doc = noop = null;
 }
 
 // don't allow anything until init() is called
+// IE seems to think it needs to attach the behavior a second time for printing
 o = {
-	init: init,
+	init: doc.media !== "print" ? init : noop,
 	handlePropertychange: noop,
 	restore: noop,
 	handleResize: noop
 };
 
 if ( element.readyState === "complete" ) {
-	init();
+	o.init();
 }
 
 })( element, window );

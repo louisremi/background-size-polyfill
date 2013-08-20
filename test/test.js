@@ -120,7 +120,7 @@ asyncTest( "teardown", function() {
 
 
 
-module( "cover, portrait", {
+module( "size, cover, portrait", {
 	setup: function() {
 		setupCSSClasses();
 		$( "#bg" )
@@ -176,7 +176,7 @@ asyncTest( "2x", function() {
 
 
 
-module( "cover, landscape", {
+module( "size, cover, landscape", {
 	setup: function() {
 		setupCSSClasses();
 		$( "#bg" )
@@ -232,7 +232,7 @@ asyncTest( "2x", function() {
 
 
 
-module( "contain, portrait", {
+module( "size, contain, portrait", {
 	setup: function() {
 		setupCSSClasses();
 		$( "#bg" )
@@ -288,7 +288,7 @@ asyncTest( "2x", function() {
 
 
 
-module( "contain, landscape", {
+module( "size, contain, landscape", {
 	setup: function() {
 		setupCSSClasses();
 		$( "#bg" )
@@ -338,6 +338,216 @@ asyncTest( "2x", function() {
 		equal( img.width(), 1600, "correct width" );
 		equal( img.height(), 1200, "correct height" );
 		deepEqual( img.position(), { left: 0, top: 200 }, "correct position" );
+		start();
+	} );
+} );
+
+
+
+module( "size, length / percentage", {
+	setup: function() {
+		setupCSSClasses();
+		$( "#bg" )
+			.css( { width: 500, height: 350, padding: "25px 50px", "background-position": "50% 50%", "font-size": 15 } )
+			.addClass( "background-image-300x400" );
+	},
+	teardown: teardownCSSClasses
+} );
+asyncTest( "150px", function() {
+	expect( 3 );
+	$( "#bg" ).addClass( "background-size-150px" );
+	polyfillReady( function() {
+		var img = $( "#bg img" );
+		equal( img.width(), 150, "correct width" );
+		equal( img.height(), 200, "correct height" );
+		deepEqual( img.position(), { left: 225, top: 100 }, "correct position" );
+		start();
+	} );
+} );
+asyncTest( "10em", function() {
+	expect( 3 );
+	$( "#bg" ).addClass( "background-size-10em" );
+	polyfillReady( function() {
+		var img = $( "#bg img" );
+		equal( img.width(), 150, "correct width" );
+		equal( img.height(), 200, "correct height" );
+		deepEqual( img.position(), { left: 225, top: 100 }, "correct position" );
+		start();
+	} );
+} );
+asyncTest( "50%", function() {
+	expect( 3 );
+	$( "#bg" ).addClass( "background-size-25percent" );
+	polyfillReady( function() {
+		var img = $( "#bg img" );
+		equal( img.width(), 150, "correct width" );
+		equal( img.height(), 200, "correct height" );
+		deepEqual( img.position(), { left: 225, top: 100 }, "correct position" );
+		start();
+	} );
+} );
+asyncTest( "150px auto", function() {
+	expect( 3 );
+	$( "#bg" ).addClass( "background-size-150px-auto" );
+	polyfillReady( function() {
+		var img = $( "#bg img" );
+		equal( img.width(), 150, "correct width" );
+		equal( img.height(), 200, "correct height" );
+		deepEqual( img.position(), { left: 225, top: 100 }, "correct position" );
+		start();
+	} );
+} );
+asyncTest( "10em auto", function() {
+	expect( 3 );
+	$( "#bg" ).addClass( "background-size-10em-auto" );
+	polyfillReady( function() {
+		var img = $( "#bg img" );
+		equal( img.width(), 150, "correct width" );
+		equal( img.height(), 200, "correct height" );
+		deepEqual( img.position(), { left: 225, top: 100 }, "correct position" );
+		start();
+	} );
+} );
+asyncTest( "50% auto", function() {
+	expect( 3 );
+	$( "#bg" ).addClass( "background-size-25percent-auto" );
+	polyfillReady( function() {
+		var img = $( "#bg img" );
+		equal( img.width(), 150, "correct width" );
+		equal( img.height(), 200, "correct height" );
+		deepEqual( img.position(), { left: 225, top: 100 }, "correct position" );
+		start();
+	} );
+} );
+asyncTest( "auto 600px", function() {
+	expect( 3 );
+	$( "#bg" ).addClass( "background-size-auto-600px" );
+	polyfillReady( function() {
+		var img = $( "#bg img" );
+		equal( img.width(), 450, "correct width" );
+		equal( img.height(), 600, "correct height" );
+		deepEqual( img.position(), { left: 75, top: -100 }, "correct position" );
+		start();
+	} );
+} );
+asyncTest( "auto 40em", function() {
+	expect( 3 );
+	$( "#bg" ).addClass( "background-size-auto-40em" );
+	polyfillReady( function() {
+		var img = $( "#bg img" );
+		equal( img.width(), 450, "correct width" );
+		equal( img.height(), 600, "correct height" );
+		deepEqual( img.position(), { left: 75, top: -100 }, "correct position" );
+		start();
+	} );
+} );
+asyncTest( "auto 150%", function() {
+	expect( 3 );
+	$( "#bg" ).addClass( "background-size-auto-150percent" );
+	polyfillReady( function() {
+		var img = $( "#bg img" );
+		equal( img.width(), 450, "correct width" );
+		equal( img.height(), 600, "correct height" );
+		deepEqual( img.position(), { left: 75, top: -100 }, "correct position" );
+		start();
+	} );
+} );
+asyncTest( "150px 150%", function() {
+	expect( 3 );
+	$( "#bg" ).addClass( "background-size-150px-150percent" );
+	polyfillReady( function() {
+		var img = $( "#bg img" );
+		equal( img.width(), 150, "correct width" );
+		equal( img.height(), 600, "correct height" );
+		deepEqual( img.position(), { left: 225, top: -100 }, "correct position" );
+		start();
+	} );
+} );
+asyncTest( "10em 600px", function() {
+	expect( 3 );
+	$( "#bg" ).addClass( "background-size-10em-600px" );
+	polyfillReady( function() {
+		var img = $( "#bg img" );
+		equal( img.width(), 150, "correct width" );
+		equal( img.height(), 600, "correct height" );
+		deepEqual( img.position(), { left: 225, top: -100 }, "correct position" );
+		start();
+	} );
+} );
+asyncTest( "25percent 40em", function() {
+	expect( 3 );
+	$( "#bg" ).addClass( "background-size-25percent-40em" );
+	polyfillReady( function() {
+		var img = $( "#bg img" );
+		equal( img.width(), 150, "correct width" );
+		equal( img.height(), 600, "correct height" );
+		deepEqual( img.position(), { left: 225, top: -100 }, "correct position" );
+		start();
+	} );
+} );
+asyncTest( "-150px (invalid)", function() {
+	expect( 3 );
+	$( "#bg" ).addClass( "background-size--150px" );
+	polyfillReady( function() {
+		var img = $( "#bg img" );
+		equal( img.width(), 300, "correct width" );
+		equal( img.height(), 400, "correct height" );
+		deepEqual( img.position(), { left: 150, top: 0 }, "correct position" );
+		start();
+	} );
+} );
+asyncTest( "-10em auto (invalid)", function() {
+	expect( 3 );
+	$( "#bg" ).addClass( "background-size--10em-auto" );
+	polyfillReady( function() {
+		var img = $( "#bg img" );
+		equal( img.width(), 300, "correct width" );
+		equal( img.height(), 400, "correct height" );
+		deepEqual( img.position(), { left: 150, top: 0 }, "correct position" );
+		start();
+	} );
+} );
+asyncTest( "auto -150% (invalid)", function() {
+	expect( 3 );
+	$( "#bg" ).addClass( "background-size-auto--150percent" );
+	polyfillReady( function() {
+		var img = $( "#bg img" );
+		equal( img.width(), 300, "correct width" );
+		equal( img.height(), 400, "correct height" );
+		deepEqual( img.position(), { left: 150, top: 0 }, "correct position" );
+		start();
+	} );
+} );
+asyncTest( "-150px 150% (invalid)", function() {
+	expect( 3 );
+	$( "#bg" ).addClass( "background-size--150px-150percent" );
+	polyfillReady( function() {
+		var img = $( "#bg img" );
+		equal( img.width(), 300, "correct width" );
+		equal( img.height(), 400, "correct height" );
+		deepEqual( img.position(), { left: 150, top: 0 }, "correct position" );
+		start();
+	} );
+} );
+asyncTest( "10em -600px (invalid)", function() {
+	expect( 3 );
+	$( "#bg" ).addClass( "background-size-10em--600px" );
+	polyfillReady( function() {
+		var img = $( "#bg img" );
+		equal( img.width(), 300, "correct width" );
+		equal( img.height(), 400, "correct height" );
+		deepEqual( img.position(), { left: 150, top: 0 }, "correct position" );
+		start();
+	} );
+} );
+asyncTest( "green (invalid)", function() {
+	expect( 3 );
+	$( "#bg" ).addClass( "background-size-green" );
+	polyfillReady( function() {
+		var img = $( "#bg img" );
+		equal( img.width(), 300, "correct width" );
+		equal( img.height(), 400, "correct height" );
+		deepEqual( img.position(), { left: 150, top: 0 }, "correct position" );
 		start();
 	} );
 } );

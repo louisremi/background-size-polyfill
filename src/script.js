@@ -3,6 +3,10 @@ var o; // and so it is
 (function( element, window ) {
 
 var rsrc = /url\(["']?(.*?)["']?\)/,
+	rprespace = /^\s\s*/,
+	rpostspace = /\s\s*$/,
+	rmidspace = /\s\s*/g,
+	rpercent = /%$/,
 	positions = {
 		top: 0,
 		left: 0,
@@ -125,13 +129,13 @@ function setStyles( el ) {
 		style.padding =
 		style.border =
 		style.outline =
-		style.fontSize =
-		style.lineHeight =
 		style.minWidth =
 		style.minHeight = 0;
 	style.background =
 		style.maxWidth =
 		style.maxHeight = "none";
+	style.fontSize =
+		style.lineHeight = "1em";
 }
 
 function getImageDimensions( expando, src, callback ) {
@@ -186,6 +190,8 @@ function takeSnapshot( element, expando ) {
 	var elementStyle = element.style,
 		elementCurrentStyle = element.currentStyle,
 		expandoRestore = expando.restore,
+		size = normalizeCSSValue( elementCurrentStyle["background-size"] ),
+		sizeList = size.split( " " ),
 		pos = [
 			elementCurrentStyle.backgroundPositionX,
 			elementCurrentStyle.backgroundPositionY
@@ -197,7 +203,10 @@ function takeSnapshot( element, expando ) {
 			innerHeight: element.offsetHeight -
 				( parseFloat( elementCurrentStyle.borderTopWidth ) || 0 ) -
 				( parseFloat( elementCurrentStyle.borderBottomWidth ) || 0 ),
-			size: elementCurrentStyle["background-size"],
+			size: size,
+			sizeIsKeyword: size === "contain" || size === "cover",
+			sizeX: sizeList[0],
+			sizeY: sizeList.length > 1 ? sizeList[1] : "auto",
 			// Only keywords or percentage values are supported
 			posX: positions[ pos[0] ] || parseFloat( pos[0] ) / 100 || 0,
 			posY: positions[ pos[1] ] || parseFloat( pos[1] ) / 100 || 0,
@@ -205,6 +214,22 @@ function takeSnapshot( element, expando ) {
 			imgWidth: 0,
 			imgHeight: 0
 		};
+
+	if ( !snapshot.sizeIsKeyword ) {
+		// negative lengths or percentages are not allowed
+		if ( !( ( parseFloat( snapshot.sizeX ) >= 0 || snapshot.sizeX === "auto" ) &&
+				( parseFloat( snapshot.sizeY ) >= 0 || snapshot.sizeY === "auto" ) ) ) {
+			snapshot.sizeX = snapshot.sizeY = "auto";
+		}
+
+		// percentages are relative to the element, not image, width/height
+		if ( rpercent.test( snapshot.sizeX ) ) {
+			snapshot.sizeX = ( snapshot.innerWidth * parseFloat( snapshot.sizeX ) / 100 || 0 ) + "px";
+		}
+		if ( rpercent.test( snapshot.sizeY ) ) {
+			snapshot.sizeY = ( snapshot.innerHeight * parseFloat( snapshot.sizeY ) / 100 || 0 ) + "px";
+		}
+	}
 
 	if ( ( rsrc.exec( elementStyle.backgroundImage ) || [] )[1] === spacer ) {
 		suspendPropertychange( function() {
@@ -221,6 +246,10 @@ function takeSnapshot( element, expando ) {
 	} );
 
 	return snapshot;
+}
+
+function normalizeCSSValue( value ) {
+	return String( value ).replace( rprespace, "" ).replace( rpostspace, "" ).replace( rmidspace, " " );
 }
 
 function processSnapshot( element, expando ) {
@@ -275,6 +304,7 @@ function isChanged( expando, snapshot ) {
 function updateBackground( element, expando, snapshot, callback ) {
 	var img = expando.img,
 		imgStyle = img.style,
+		size = snapshot.size,
 		innerWidth = snapshot.innerWidth,
 		innerHeight = snapshot.innerHeight,
 		imgWidth = snapshot.imgWidth,
@@ -293,49 +323,96 @@ function updateBackground( element, expando, snapshot, callback ) {
 		delta;
 
 	if ( innerWidth && innerHeight && imgWidth && imgHeight ) {
-		elemRatio = innerWidth / innerHeight;
-		imgRatio = imgWidth / imgHeight;
+		img.src = snapshot.src;
 
-		if ( snapshot.size === "contain" ) {
-			if ( imgRatio > elemRatio ) {
-				delta = Math.floor( ( innerHeight - innerWidth / imgRatio ) * posY );
+		if ( snapshot.sizeIsKeyword ) {
+			elemRatio = innerWidth / innerHeight;
+			imgRatio = imgWidth / imgHeight;
 
-				top = delta + px;
-				width = oneHundredPercent;
+			// this will always floor towards zero
+			// can we just do Math.round()?
 
-			// elemRatio > imgRatio
+			if ( size === "contain" ) {
+				if ( imgRatio > elemRatio ) {
+					delta = Math.floor( ( innerHeight - innerWidth / imgRatio ) * posY );
+
+					top = delta + px;
+					width = oneHundredPercent;
+
+				// elemRatio > imgRatio
+				} else {
+					delta = Math.floor( ( innerWidth - innerHeight * imgRatio ) * posX );
+
+					left = delta + px;
+					height = oneHundredPercent;
+				}
+
+			// size === "cover"
 			} else {
-				delta = Math.floor( ( innerWidth - innerHeight * imgRatio ) * posX );
+				if ( imgRatio > elemRatio ) {
+					delta = Math.floor( ( innerHeight * imgRatio - innerWidth ) * posX );
 
-				left = delta + px;
-				height = oneHundredPercent;
+					left = -delta + px;
+					height = oneHundredPercent;
+
+				// elemRatio > imgRatio
+				} else {
+					delta = Math.floor( ( innerWidth / imgRatio - innerHeight ) * posY );
+
+					top = -delta + px;
+					width = oneHundredPercent;
+				}
 			}
 
-		} else if ( snapshot.size === "cover" ) {
-			if ( imgRatio > elemRatio ) {
-				delta = Math.floor( ( innerHeight * imgRatio - innerWidth ) * posX );
+			imgStyle.left = left;
+			imgStyle.top = top;
+			imgStyle.width = width;
+			imgStyle.height = height;
 
-				left = -delta + px;
-				height = oneHundredPercent;
+			display = "block";
 
-			// elemRatio > imgRatio
-			} else {
-				delta = Math.floor( ( innerWidth / imgRatio - innerHeight ) * posY );
+		} else {
+			// need to set width/height then calculate left/top from the actual width/height
+			imgStyle.display = "block";
+			imgStyle.width = snapshot.sizeX;
+			imgStyle.height = snapshot.sizeY;
 
-				top = -delta + px;
-				width = oneHundredPercent;
+			imgWidth = img.width;
+			imgHeight = img.height;
+
+			if ( imgWidth && imgHeight ) {
+				// flooring towards zero again
+
+				if ( imgWidth < innerWidth ) {
+					delta = Math.floor( ( innerWidth - imgWidth ) * posX );
+
+					left = delta + px;
+
+				} else {
+					delta = Math.floor( ( imgWidth - innerWidth ) * posX );
+
+					left = -delta + px;
+				}
+
+				if ( imgHeight < innerHeight ) {
+					delta = Math.floor( ( innerHeight - imgHeight ) * posY );
+
+					top = delta + px;
+
+				} else {
+					delta = Math.floor( ( imgHeight - innerHeight ) * posY );
+
+					top = -delta + px;
+				}
+
+				imgStyle.left = left;
+				imgStyle.top = top;
+
+				display = "block";
 			}
 		}
-
-		imgStyle.left = left;
-		imgStyle.top = top;
-		imgStyle.width = width;
-		imgStyle.height = height;
-
-		display = "block";
 	}
 
-	img.src = snapshot.src;
 	imgStyle.display = display;
 
 	expando.current = snapshot;

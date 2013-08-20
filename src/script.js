@@ -22,36 +22,30 @@ var rsrc = /url\(["']?(.*?)["']?\)/,
 
 // remove the background-image and emulate it with a wrapped <img/>
 function init() {
-	var expando = element.bgsExpando,
+	var wrapper = doc.createElement( "div" ),
+		img = doc.createElement( "img" ),
+		wrapperStyle = wrapper.style,
 		elementStyle = element.style,
 		elementCurrentStyle = element.currentStyle,
-		wrapper = element.firstChild,
-		img = ( wrapper || {} ).firstChild,
-		wrapperStyle;
+		expando = element.bgsExpando,
+		cloneWrapper = element.firstChild;
 
-	if ( expando && expando.restore ) {
-		elementStyle.backgroundImage = expando.restore.backgroundImage;
-		elementStyle.position = expando.restore.position;
-		elementStyle.zIndex = expando.restore.zIndex;
-	}
+	if ( expando ) {
+		if ( expando.restore ) {
+			elementStyle.backgroundImage = expando.restore.backgroundImage;
+			elementStyle.position = expando.restore.position;
+			elementStyle.zIndex = expando.restore.zIndex;
+		}
 
-	if ( !expando ||
-			!wrapper ||
-			( wrapper.nodeName || "" ).toUpperCase() !== "DIV" ||
-			wrapper.className !== wrapperClass ||
-			wrapper.childNodes.length !== 1 ||
-			!img ||
-			( img.nodeName || "" ).toUpperCase() !== "IMG" ) {
-		wrapper = doc.createElement( "div" );
-		img = doc.createElement( "img" );
-
-		wrapper.className = wrapperClass;
-		wrapper.appendChild( img );
-		element.insertBefore( wrapper, element.firstChild );
+		if ( cloneWrapper &&
+				( cloneWrapper.nodeName || "" ).toUpperCase() === "DIV" &&
+				cloneWrapper.className === wrapperClass) {
+			element.removeChild( cloneWrapper );
+		}
 	}
 
 	setStyles( wrapper );
-	wrapperStyle = wrapper.style;
+	wrapper.className = wrapperClass;
 	wrapperStyle.top =
 		wrapperStyle.right =
 		wrapperStyle.bottom =
@@ -59,6 +53,10 @@ function init() {
 
 	setStyles( img );
 	img.alt = "";
+
+	wrapper.appendChild( img );
+
+	element.insertBefore( wrapper, element.firstChild );
 
 	// save useful data for quick access
 	element.bgsExpando = expando = {

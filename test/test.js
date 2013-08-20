@@ -807,7 +807,7 @@ module( "clone element", {
 	},
 	teardown: teardownCSSClasses
 } );
-asyncTest( "cloneNode(false)", function() {
+asyncTest( "cloneNode( false )", function() {
 	expect( 4 );
 	var div = $( "#bg" ),
 		clone = $( div[0].cloneNode( false ) );
@@ -825,7 +825,7 @@ asyncTest( "cloneNode(false)", function() {
 	} );
 	clone.insertAfter( div );
 } );
-asyncTest( "cloneNode(true)", function() {
+asyncTest( "cloneNode( true )", function() {
 	expect( 4 );
 	var div = $( "#bg" ),
 		clone = $( div[0].cloneNode( true ) );

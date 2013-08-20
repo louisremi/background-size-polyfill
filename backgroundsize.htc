@@ -64,6 +64,7 @@ function init() {
 		wrapperStyle.right =
 		wrapperStyle.bottom =
 		wrapperStyle.left = 0;
+	wrapperStyle.position = "fixed"; // test value
 
 	setStyles( img );
 	img.alt = "";
@@ -88,8 +89,12 @@ function init() {
 		loadImg: null,     // temp img element/object from getImageDimensions
 		display: false,    // element's display property
 		changed: false,    // whether element's display property has changed
-		ignore: false      // whether to ignore the next property change event
+		ignore: false,     // whether to ignore the next property change event
+		// whether we can support background-attachment: fixed for this element/browser
+		canFixed: element.nodeName.toUpperCase() === "BODY" && wrapper.offsetHeight > 0
 	};
+
+	wrapperStyle.position = "absolute";
 
 	// This is the part where we mess with the existing DOM
 	// to make sure that the background image is correctly zIndexed
@@ -220,6 +225,7 @@ function takeSnapshot( element, expando ) {
 			// Only keywords or percentage values are supported
 			posX: positions[ pos[0] ] || parseFloat( pos[0] ) / 100 || 0,
 			posY: positions[ pos[1] ] || parseFloat( pos[1] ) / 100 || 0,
+			attachment: elementCurrentStyle.backgroundAttachment,
 			src: "",
 			imgWidth: 0,
 			imgHeight: 0
@@ -333,6 +339,10 @@ function updateBackground( element, expando, snapshot, callback ) {
 		delta;
 
 	if ( innerWidth && innerHeight && imgWidth && imgHeight ) {
+		expando.wrapper.style.position =
+			snapshot.attachment === "fixed" && expando.canFixed ?
+			"fixed" : "absolute";
+
 		img.src = snapshot.src;
 
 		if ( snapshot.sizeIsKeyword ) {

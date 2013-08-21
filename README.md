@@ -6,16 +6,19 @@ A continuation of louisremi's [background-size polyfill](https://github.com/loui
 Changes
 -------
 
-- Added support for dynamically changing position and size of the background image (partial reimplementation of louisremi#8)  
-- Added support for dynamically changing background image with CSS classes  
-- Added support for dynamically setting background image to `none` (louisremi#13)  
-- Added support for lengths and percentages for background size (partial reimplementation of louisremi#8, louisremi#19)  
-- Added debouncing of window resize events (alternative implementation of louisremi#17)  
-- Added support for cloning polyfilled elements (louisremi#2)  
-- Added support for `background-attachment: fixed` for `body` (louisremi#22)  
-- Fixed JS error when using `left` or `top` for `background-position` (louisremi#14, louisremi#21, louisremi#24)  
-- Fixed other "Invalid argument" / `NaN` JS errors (louisremi#11, louisremi#16, louisremi#23)  
-- Fixed JS error when printing  
+- Added support for:  
+  - Dynamically changing position and size of the background image (partial reimplementation of louisremi#8)  
+  - Dynamically changing background image with CSS classes  
+  - Dynamically setting background image to `none` (louisremi#13)  
+  - Lengths and percentages for background size (partial reimplementation of louisremi#8, louisremi#19)  
+  - Lengths for background position  
+  - Debouncing window resize events (alternative implementation of louisremi#17)  
+  - Cloning polyfilled elements (louisremi#2)  
+  - `background-attachment: fixed` for `body` (louisremi#22)  
+- Fixed:  
+  - JS error when using `left` or `top` for `background-position` (louisremi#14, louisremi#21, louisremi#24)  
+  - Other "Invalid argument" / `NaN` JS errors (louisremi#11, louisremi#16, louisremi#23)  
+  - JS error when printing  
 - Use standard HTC XML tags (louisremi#10)  
 - Work around IE hang on unload when the JScript portion is greater than 512 bytes  
 - Added unit tests, grunt build process  

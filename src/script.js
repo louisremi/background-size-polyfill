@@ -197,10 +197,6 @@ function takeSnapshot( element, expando ) {
 		expandoRestore = expando.restore,
 		size = normalizeCSSValue( elementCurrentStyle["background-size"] ),
 		sizeList = size.split( " " ),
-		pos = [
-			elementCurrentStyle.backgroundPositionX,
-			elementCurrentStyle.backgroundPositionY
-		],
 		snapshot = {
 			innerWidth: element.offsetWidth -
 				( parseFloat( elementCurrentStyle.borderLeftWidth ) || 0 ) -
@@ -212,15 +208,15 @@ function takeSnapshot( element, expando ) {
 			sizeIsKeyword: size === "contain" || size === "cover",
 			sizeX: sizeList[0],
 			sizeY: sizeList.length > 1 ? sizeList[1] : "auto",
-			// Only keywords or percentage values are supported
-			posX: positions[ pos[0] ] || parseFloat( pos[0] ) / 100 || 0,
-			posY: positions[ pos[1] ] || parseFloat( pos[1] ) / 100 || 0,
+			posX: elementCurrentStyle.backgroundPositionX,
+			posY: elementCurrentStyle.backgroundPositionY,
 			attachment: elementCurrentStyle.backgroundAttachment,
 			src: "",
 			imgWidth: 0,
 			imgHeight: 0
 		};
 
+	// length / percentage size
 	if ( !snapshot.sizeIsKeyword ) {
 		// negative lengths or percentages are not allowed
 		if ( !( ( parseFloat( snapshot.sizeX ) >= 0 || snapshot.sizeX === "auto" ) &&
@@ -237,16 +233,28 @@ function takeSnapshot( element, expando ) {
 		}
 	}
 
+	// keyword / percentage positions
+	if ( snapshot.posX in positions || rpercent.test( snapshot.posX ) ) {
+		snapshot.posX = positions[ snapshot.posX ] || parseFloat( snapshot.posX ) / 100 || 0;
+	}
+	if ( snapshot.posY in positions || rpercent.test( snapshot.posY ) ) {
+		snapshot.posY = positions[ snapshot.posY ] || parseFloat( snapshot.posY ) / 100 || 0;
+	}
+
+	// image
 	if ( ( rsrc.exec( elementStyle.backgroundImage ) || [] )[1] === spacer ) {
+		// inline style wasn't set, but a class change could change the background image
+		// so restore the previous inline style before measuring
 		suspendPropertychange( function() {
 			elementStyle.backgroundImage = expandoRestore.backgroundImage;
 		} );
 	} else {
+		// inline style was set, so save it in our restore list
 		expandoRestore.backgroundImage = elementStyle.backgroundImage;
 	}
-
 	snapshot.src = ( rsrc.exec( elementCurrentStyle.backgroundImage ) || [] )[1];
-
+	// set inline background image to the transparent spacer gif
+	// this allows JavaScript to later set it to "none"
 	suspendPropertychange( function() {
 		elementStyle.backgroundImage = "url(" + spacer + ")";
 	} );
@@ -317,6 +325,8 @@ function updateBackground( element, expando, snapshot, callback ) {
 		imgHeight = snapshot.imgHeight,
 		posX = snapshot.posX,
 		posY = snapshot.posY,
+		posXIsPercent = typeof posX === "number",
+		posYIsPercent = typeof posY === "number",
 		display = "none",
 		left = 0,
 		top = 0,
@@ -352,8 +362,8 @@ function updateBackground( element, expando, snapshot, callback ) {
 				height = oneHundredPercent;
 			}
 
-			imgStyle.left = left;
-			imgStyle.top = top;
+			imgStyle.left = posXIsPercent ? left : posX;
+			imgStyle.top = posYIsPercent ? top : posY;
 			imgStyle.width = width;
 			imgStyle.height = height;
 
@@ -369,8 +379,8 @@ function updateBackground( element, expando, snapshot, callback ) {
 			imgHeight = img.height;
 
 			if ( imgWidth && imgHeight ) {
-				imgStyle.left = floorTowardsZero( ( innerWidth - imgWidth ) * posX ) + px;
-				imgStyle.top = floorTowardsZero( ( innerHeight - imgHeight ) * posY ) + px;
+				imgStyle.left = posXIsPercent ? floorTowardsZero( ( innerWidth - imgWidth ) * posX ) + px : posX;
+				imgStyle.top = posYIsPercent ? floorTowardsZero( ( innerHeight - imgHeight ) * posY ) + px : posY;
 
 				display = "block";
 			}

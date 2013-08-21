@@ -40,6 +40,8 @@
 .background-size-25percent-40em {
 	background-size:   25%   40em  ,  auto auto;
 }
+
+/* these are invalid */
 .background-size--150px {
 	background-size: -150px;
 }
@@ -58,6 +60,7 @@
 .background-size-green {
 	background-size: green;
 }
+
 .polyfill {
 	-ms-behavior: url(../backgroundsize.htc);
 	behavior: url(../backgroundsize.htc);

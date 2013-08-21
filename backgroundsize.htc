@@ -335,8 +335,7 @@ function updateBackground( element, expando, snapshot, callback ) {
 		px = "px",
 		oneHundredPercent = "100%",
 		elemRatio,
-		imgRatio,
-		delta;
+		imgRatio;
 
 	if ( innerWidth && innerHeight && imgWidth && imgHeight ) {
 		expando.wrapper.style.position =
@@ -345,43 +344,22 @@ function updateBackground( element, expando, snapshot, callback ) {
 
 		img.src = snapshot.src;
 
+		// can we do Math.round() instead of flooring towards zero?
+
 		if ( snapshot.sizeIsKeyword ) {
 			elemRatio = innerWidth / innerHeight;
 			imgRatio = imgWidth / imgHeight;
 
-			// this will always floor towards zero
-			// can we just do Math.round()?
+			if ( ( size === "contain" && imgRatio > elemRatio ) ||
+					( size === "cover" && elemRatio > imgRatio ) ) {
+				top = floorTowardsZero( ( innerHeight - innerWidth / imgRatio ) * posY ) + px;
+				width = oneHundredPercent;
 
-			if ( size === "contain" ) {
-				if ( imgRatio > elemRatio ) {
-					delta = Math.floor( ( innerHeight - innerWidth / imgRatio ) * posY );
-
-					top = delta + px;
-					width = oneHundredPercent;
-
-				// elemRatio > imgRatio
-				} else {
-					delta = Math.floor( ( innerWidth - innerHeight * imgRatio ) * posX );
-
-					left = delta + px;
-					height = oneHundredPercent;
-				}
-
-			// size === "cover"
+			// size === "contain" && elemRatio > imgRatio ||
+			// size === "cover" && imgRatio > elemRatio
 			} else {
-				if ( imgRatio > elemRatio ) {
-					delta = Math.floor( ( innerHeight * imgRatio - innerWidth ) * posX );
-
-					left = -delta + px;
-					height = oneHundredPercent;
-
-				// elemRatio > imgRatio
-				} else {
-					delta = Math.floor( ( innerWidth / imgRatio - innerHeight ) * posY );
-
-					top = -delta + px;
-					width = oneHundredPercent;
-				}
+				left = floorTowardsZero( ( innerWidth - innerHeight * imgRatio ) * posX ) + px;
+				height = oneHundredPercent;
 			}
 
 			imgStyle.left = left;
@@ -401,32 +379,8 @@ function updateBackground( element, expando, snapshot, callback ) {
 			imgHeight = img.height;
 
 			if ( imgWidth && imgHeight ) {
-				// flooring towards zero again
-
-				if ( imgWidth < innerWidth ) {
-					delta = Math.floor( ( innerWidth - imgWidth ) * posX );
-
-					left = delta + px;
-
-				} else {
-					delta = Math.floor( ( imgWidth - innerWidth ) * posX );
-
-					left = -delta + px;
-				}
-
-				if ( imgHeight < innerHeight ) {
-					delta = Math.floor( ( innerHeight - imgHeight ) * posY );
-
-					top = delta + px;
-
-				} else {
-					delta = Math.floor( ( imgHeight - innerHeight ) * posY );
-
-					top = -delta + px;
-				}
-
-				imgStyle.left = left;
-				imgStyle.top = top;
+				imgStyle.left = floorTowardsZero( ( innerWidth - imgWidth ) * posX ) + px;
+				imgStyle.top = floorTowardsZero( ( innerHeight - imgHeight ) * posY ) + px;
 
 				display = "block";
 			}
@@ -447,6 +401,12 @@ function updateBackground( element, expando, snapshot, callback ) {
 		// if ondetach is triggered, updateBackgroundCallbackId will be cleared
 		updateEvent.fire();
 	}, 0 );
+}
+
+function floorTowardsZero( value ) {
+	var isNegative = value < 0;
+	value = Math.floor( Math.abs( value ) );
+	return isNegative ? -value : value;
 }
 
 // handle different style changes

@@ -48,8 +48,6 @@ function polyfillReady( callback ) {
 	$( "#bg" ).addClass( "polyfill" );
 }
 
-window.bgsSpacerGif = "../spacer.gif";
-
 
 
 module( "general", {

@@ -105,24 +105,14 @@ function init() {
 		elementStyle.position = "relative";
 	}
 
-	// allow init() to be called only once
-	o.init = noop;
+	o = {
+		init: noop, // allow init() to be called only once
+		handlePropertychange: handlePropertychange,
+		restore: restore,
+		handleResize: handleResize
+	};
 
-	// check if browser supports our data uri spacer gif
-	getImageDimensions( expando, spacer, function( width, height ) {
-		if ( width !== 1 || height !== 1 ) {
-			spacer = window.bgsSpacerGif;
-		}
-
-		o = {
-			init: noop,
-			handlePropertychange: handlePropertychange,
-			restore: restore,
-			handleResize: handleResize
-		};
-
-		handlePropertychange();
-	} );
+	handlePropertychange();
 }
 
 function setStyles( el ) {

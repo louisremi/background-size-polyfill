@@ -9,6 +9,7 @@ body {
 	margin: 0;
 	background: url(images/algeria.jpg) center no-repeat;
 	-ms-behavior: url(backgroundsize.min.htc);
+	behavior: url(backgroundsize.min.htc);
 }
 .bgsCover {
 	background-size: cover;
@@ -50,6 +51,7 @@ body:after {
 	background-repeat: no-repeat;
 	background-size: contain;
 	-ms-behavior: url(backgroundsize.min.htc);
+	behavior: url(backgroundsize.min.htc);
 }
 #carousel .active {
 	display: block;
@@ -142,14 +144,16 @@ document.getElementById("switchSize").onclick = function() {
 	document.body.className = "bgs" + sizes[ curSize ];
 };*/
 
-var items = document.querySelectorAll("#carousel li"),
-	curItem = 0;
-setInterval(function() {
-	items[ curItem ].className = "";
+window.onload = function() {
+	var items = document.getElementById("carousel").getElementsByTagName("li"),
+		curItem = 0;
+	setInterval(function() {
+		items[ curItem ].className = "";
 
-	curItem = ( curItem + 1 ) % items.length;
-	items[ curItem ].className = "active";
-}, 3000);
+		curItem = ( curItem + 1 ) % items.length;
+		items[ curItem ].className = "active";
+	}, 3000);
+};
 
 </script>
 </body>

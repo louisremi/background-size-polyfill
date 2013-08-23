@@ -88,7 +88,10 @@ asyncTest( "setup", function() {
 asyncTest( "teardown", function() {
 	expect( 7 );
 
-	var div = $( "#bg" ), url = getUrl( "800x600" );
+	var div = $( "#bg" ),
+		url = getUrl( "800x600" ),
+		position = div[0].style.position,
+		zIndex = div[0].style.zIndex;
 
 	div.css( "background-image", url );
 
@@ -107,8 +110,8 @@ asyncTest( "teardown", function() {
 
 			equal( children.length, 1, "wrapper removed" );
 			equal( ( children.prop( "nodeName" ) || "" ).toUpperCase(), "SPAN", "element content unaffected" );
-			equal( div[0].style.position, "static", "element inline position restored" );
-			strictEqual( div[0].style.zIndex, "", "element (lack of) inline z-index restored" );
+			equal( div[0].style.position, position, "element inline position restored" );
+			strictEqual( div[0].style.zIndex, zIndex, "element (lack of) inline z-index restored" );
 			equal( div[0].style.backgroundImage, url, "element inline background-image restored" );
 
 			start();
@@ -1246,10 +1249,11 @@ module( "element not visible", {
 	teardown: teardownCSSClasses
 } );
 asyncTest( "visibility: hidden", function() {
-	expect( 1 );
+	expect( 2 );
 	$( "#bg" ).css( "visibility", "hidden" );
 	polyfillReady( function() {
-		equal( $( "#bg img" ).css( "visibility" ), "hidden", "img is hidden" );
+		notEqual( $( "#bg img" ).parent().css( "visibility" ), "visible", "wrapper is hidden" );
+		notEqual( $( "#bg img" ).css( "visibility" ), "visible", "img is hidden" );
 		start();
 	} );
 } );

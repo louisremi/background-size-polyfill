@@ -1,31 +1,3 @@
-background-size polyfill redux
-==============================
-
-A continuation of louisremi's [background-size polyfill](https://github.com/louisremi/background-size-polyfill).
-
-Changes
--------
-
-- Added support for:  
-  - Dynamically changing position and size of the background image (partial reimplementation of louisremi#8)  
-  - Dynamically changing background image with CSS classes  
-  - Dynamically setting background image to `none` (louisremi#13)  
-  - Lengths and percentages for background size (partial reimplementation of louisremi#8, louisremi#19)  
-  - Lengths for background position  
-  - Debouncing window resize events (alternative implementation of louisremi#17)  
-  - Cloning polyfilled elements (louisremi#2)  
-  - `background-attachment: fixed` for `body` (louisremi#22)  
-- Fixed:  
-  - JS error when using `left` or `top` for `background-position` (louisremi#14, louisremi#21, louisremi#24)  
-  - Other "Invalid argument" / `NaN` JS errors (louisremi#11, louisremi#16, louisremi#23)  
-  - JS error when printing  
-- Use standard HTC XML tags (louisremi#10)  
-- Work around IE hang on unload when the JScript portion is greater than 512 bytes  
-- Added unit tests, grunt build process  
-- Misc fixes and code cleanup
-
-------------------------------------------------------------------------
-
 background-size polyfill
 ========================
 
@@ -78,10 +50,8 @@ It is thus impossible to emulate `background-size` completely and perfectly. But
 - updated image, position and size when the background-image is modified
 
 The following style properties, values or behavior aren't supported:  
-- values other than `cover` or `contain` in `background-size`  
 - multiple backgrounds (although the :after trick can still be used)  
 - 4 values syntax of `background-position`  
-- lengths (px, em, etc.) in `background-position` (only percentages and keywords such as `center` work)  
 - any `repeat` value in `background-repeat`  
 - non-default values of background-[clip/origin/attachment/scroll]  
 - resizing the background when the dimensions of the element change
@@ -89,9 +59,36 @@ The following style properties, values or behavior aren't supported:
 Removing any of these limitations is probably just one fork away...
 
 License
------------------
+-------
 
 MIT Licensed http://louisremi.mit-license.org/, by [@louis_remi](http://twitter.com/louis_remi)
 
 Are you using this in a paid work?  
 Send me music http://www.amazon.co.uk/wishlist/HNTU0468LQON
+
+Changelog
+---------
+
+### 0.2.0 (2013-08-27)
+
+- Added support for:  
+  - Dynamically changing position and size of the background image (partial reimplementation of louisremi#8)  
+  - Dynamically changing background image with CSS classes  
+  - Dynamically setting background image to `none` (louisremi#13)  
+  - Lengths and percentages for background size (partial reimplementation of louisremi#8, louisremi#19)  
+  - Lengths for background position  
+  - Debouncing window resize events (alternative implementation of louisremi#17)  
+  - Cloning polyfilled elements (louisremi#2)  
+  - `background-attachment: fixed` for `body` (louisremi#22)  
+- Fixed:  
+  - JS error when using `left` or `top` for `background-position` (louisremi#14, louisremi#21, louisremi#24)  
+  - Other "Invalid argument" / `NaN` JS errors (louisremi#11, louisremi#16, louisremi#23)  
+  - JS error when printing  
+- Use standard HTC XML tags (louisremi#10)  
+- Work around IE hang on unload when the JScript portion is greater than 512 bytes  
+- Added unit tests, grunt build process  
+- Misc fixes and code cleanup
+
+### 0.1.0 (2012-11-23)
+
+- Initial release

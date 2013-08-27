@@ -1,7 +1,7 @@
 background-size polyfill
 ========================
 
-An IE behavior adding support for `background-size: cover;` and `background-size: contain;` to IE8.
+An IE behavior adding support for `background-size` to IE8.
 
 **[Demo](http://louisremi.github.com/background-size-polyfill/)**
 
@@ -22,7 +22,7 @@ How to use it?
 
 Upload `backgroundsize.min.htc` to your website, along with the `.htaccess` that will send the mime-type required by IE (Apache only — it's built in nginx, node and IIS).
 
-Everywhere you use `background-size: cover;` or `background-size: contain;` in your CSS, add a reference to this file.
+Everywhere you use `background-size` in your CSS, add a reference to this file.
 
 ```css
 .selector { 
@@ -38,7 +38,7 @@ If not, they will be given a `position: relative;` and `z-index: 0;`.
 Limitations
 -----------
 
-This polyfill inserts an `<img/>` in the background of all elements matched in the css to emulate the `cover` or `contain` value.
+This polyfill inserts an `<img/>` in the background of all elements matched in the css to emulate the `background-size` value.
 Calculating the displayed position and size of this image is quite complex and function of numerous parameters:  
 - the size of the element itself  
 - the size of the image  

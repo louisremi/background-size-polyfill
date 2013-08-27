@@ -61,8 +61,8 @@ Removing any of these limitations is probably just one fork away...
 License
 -------
 
-MIT Licensed http://louisremi.mit-license.org/, by [@louis_remi](http://twitter.com/louis_remi) and 
-[@jefferyto](http://twitter.com/jefferyto)
+MIT Licensed http://louisremi.mit-license.org/
+Early versions by [@louis_remi](http://twitter.com/louis_remi), now maintained by [@jefferyto](http://twitter.com/jefferyto)
 
 Are you using this in a paid work?  
 Send me music http://www.amazon.co.uk/wishlist/HNTU0468LQON

@@ -72,19 +72,19 @@ Changelog
 ### 0.2.0 (2013-08-27)
 
 - Added support for:  
-  - Dynamically changing position and size of the background image (partial reimplementation of louisremi#8)  
+  - Dynamically changing position and size of the background image (partial reimplementation of #8)  
   - Dynamically changing background image with CSS classes  
-  - Dynamically setting background image to `none` (louisremi#13)  
-  - Lengths and percentages for background size (partial reimplementation of louisremi#8, louisremi#19)  
+  - Dynamically setting background image to `none` (#13)  
+  - Lengths and percentages for background size (partial reimplementation of #8, #19)  
   - Lengths for background position  
-  - Debouncing window resize events (alternative implementation of louisremi#17)  
-  - Cloning polyfilled elements (louisremi#2)  
-  - `background-attachment: fixed` for `body` (louisremi#22)  
+  - Debouncing window resize events (alternative implementation of #17)  
+  - Cloning polyfilled elements (#2)  
+  - `background-attachment: fixed` for `body` (#22)  
 - Fixed:  
-  - JS error when using `left` or `top` for `background-position` (louisremi#14, louisremi#21, louisremi#24)  
-  - Other "Invalid argument" / `NaN` JS errors (louisremi#11, louisremi#16, louisremi#23)  
+  - JS error when using `left` or `top` for `background-position` (#14, #21, #24)  
+  - Other "Invalid argument" / `NaN` JS errors (#11, #16, #23)  
   - JS error when printing  
-- Use standard HTC XML tags (louisremi#10)  
+- Use standard HTC XML tags (#10)  
 - Work around IE hang on unload when the JScript portion is greater than 512 bytes  
 - Added unit tests, grunt build process  
 - Misc fixes and code cleanup

@@ -1,0 +1,68 @@
+.background-size-cover {
+	background-size: cover;
+}
+.background-size-contain {
+	background-size: contain;
+}
+.background-size-150px {
+	background-size: 150px;
+}
+.background-size-10em {
+	background-size: 10em;
+}
+.background-size-25percent {
+	background-size: 25%;
+}
+.background-size-150px-auto {
+	background-size: 150px auto;
+}
+.background-size-10em-auto {
+	background-size: 10em auto;
+}
+.background-size-25percent-auto {
+	background-size: 25% auto;
+}
+.background-size-auto-600px {
+	background-size: auto 600px;
+}
+.background-size-auto-40em {
+	background-size: auto 40em;
+}
+.background-size-auto-150percent {
+	background-size: auto 150%;
+}
+.background-size-150px-150percent {
+	background-size: 150px 150%;
+}
+.background-size-10em-600px {
+	background-size: 10em 600px;
+}
+.background-size-25percent-40em {
+	background-size:   25%   40em  ,  auto auto;
+}
+
+/* these are invalid */
+.background-size--150px {
+	background-size: -150px;
+}
+.background-size--10em-auto {
+	background-size: -10em auto;
+}
+.background-size-auto--150percent {
+	background-size: auto -150%;
+}
+.background-size--150px-150percent {
+	background-size: -150px 150%;
+}
+.background-size-10em--600px {
+	background-size: 10em -600px;
+}
+.background-size-green {
+	background-size: green;
+}
+
+.polyfill {
+	-ms-behavior: url(../backgroundsize.htc);
+	behavior: url(../backgroundsize.htc);
+}
+

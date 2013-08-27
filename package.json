@@ -1,0 +1,40 @@
+{
+	"name": "background-size-polyfill",
+	"description": "Adds support for background-size \"cover\" and \"contain\" to IE8",
+	"version": "0.2.0",
+	"homepage": "http://louisremi.github.com/background-size-polyfill/",
+	"author": {
+		"name": "Louis-Rémi Babé",
+		"email": "public@lrbabe.com",
+		"url": "https://github.com/louisremi"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/louisremi/background-size-polyfill.git"
+	},
+	"bugs": {
+		"url": "https://github.com/louisremi/background-size-polyfill/issues"
+	},
+	"keywords": [
+		"background-size",
+		"polyfill"
+	],
+	"licenses": [
+		{
+			"type": "MIT",
+			"url": "https://github.com/louisremi/background-size-polyfill/blob/gh-pages/MIT-LICENSE"
+		}
+	],
+	"dependencies": {},
+	"devDependencies": {
+		"grunt": "~0.4.1",
+		"grunt-jsonlint": "~1.0.0",
+		"grunt-contrib-jshint": "~0.6.3",
+		"grunt-contrib-concat": "~0.3.0",
+		"grunt-contrib-uglify": "~0.2.2",
+		"grunt-compare-size": "~0.4.0-rc.3",
+		"grunt-contrib-watch": "~0.5.2",
+		"grunt-git-authors": "~1.2.0",
+		"gzip-js": "~0.3.2"
+	}
+}

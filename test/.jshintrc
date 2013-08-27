@@ -1,0 +1,40 @@
+{
+	"curly": true,
+	"eqeqeq": true,
+	"es3": true,
+	"immed": true,
+	"latedef": true,
+	"newcap": true,
+	"noarg": true,
+	"quotmark": "double",
+	"trailing": true,
+	"undef": true,
+	"unused": true,
+
+	"eqnull": true,
+	"smarttabs": true,
+
+	"browser": true,
+	"devel": true,
+	"jquery": true,
+
+	"onevar": true,
+
+	"globals": {
+		"asyncTest": false,
+		"deepEqual": false,
+		"equal": false,
+		"expect": false,
+		"module": false,
+		"notDeepEqual": false,
+		"notEqual": false,
+		"notStrictEqual": false,
+		"ok": false,
+		"QUnit": false,
+		"start": false,
+		"stop": false,
+		"strictEqual": false,
+		"test": false,
+		"throws": false
+	}
+}

@@ -1,7 +1,7 @@
 background-size polyfill
 ========================
 
-An IE behavior adding support for `background-size: cover;` and `background-size: contain;` to IE8.
+An IE behavior adding support for `background-size` to IE8.
 
 **[Demo](http://louisremi.github.com/background-size-polyfill/)**
 
@@ -22,7 +22,7 @@ How to use it?
 
 Upload `backgroundsize.min.htc` to your website, along with the `.htaccess` that will send the mime-type required by IE (Apache only — it's built in nginx, node and IIS).
 
-Everywhere you use `background-size: cover;` or `background-size: contain;` in your CSS, add a reference to this file.
+Everywhere you use `background-size` in your CSS, add a reference to this file.
 
 ```css
 .selector { 
@@ -38,7 +38,7 @@ If not, they will be given a `position: relative;` and `z-index: 0;`.
 Limitations
 -----------
 
-This polyfill inserts an `<img/>` in the background of all elements matched in the css to emulate the `cover` or `contain` value.
+This polyfill inserts an `<img/>` in the background of all elements matched in the css to emulate the `background-size` value.
 Calculating the displayed position and size of this image is quite complex and function of numerous parameters:  
 - the size of the element itself  
 - the size of the image  
@@ -50,10 +50,8 @@ It is thus impossible to emulate `background-size` completely and perfectly. But
 - updated image, position and size when the background-image is modified
 
 The following style properties, values or behavior aren't supported:  
-- values other than `cover` or `contain` in `background-size`  
 - multiple backgrounds (although the :after trick can still be used)  
 - 4 values syntax of `background-position`  
-- lengths (px, em, etc.) in `background-position` (only percentages and keywords such as `center` work)  
 - any `repeat` value in `background-repeat`  
 - non-default values of background-[clip/origin/attachment/scroll]  
 - resizing the background when the dimensions of the element change
@@ -61,9 +59,37 @@ The following style properties, values or behavior aren't supported:
 Removing any of these limitations is probably just one fork away...
 
 License
------------------
+-------
 
-MIT Licensed http://louisremi.mit-license.org/, by [@louis_remi](http://twitter.com/louis_remi)
+MIT Licensed http://louisremi.mit-license.org/, by [@louis_remi](http://twitter.com/louis_remi) and 
+[@jefferyto](http://twitter.com/jefferyto)
 
 Are you using this in a paid work?  
 Send me music http://www.amazon.co.uk/wishlist/HNTU0468LQON
+
+Changelog
+---------
+
+### 0.2.0 (2013-08-27)
+
+- Added support for:  
+  - Dynamically changing position and size of the background image (partial reimplementation of #8)  
+  - Dynamically changing background image with CSS classes  
+  - Dynamically setting background image to `none` (#13)  
+  - Lengths and percentages for background size (partial reimplementation of #8, #19)  
+  - Lengths for background position  
+  - Debouncing window resize events (alternative implementation of #17)  
+  - Cloning polyfilled elements (#2)  
+  - `background-attachment: fixed` for `body` (#22)  
+- Fixed:  
+  - JS error when using `left` or `top` for `background-position` (#14, #21, #24)  
+  - Other "Invalid argument" / `NaN` JS errors (#11, #16, #23)  
+  - JS error when printing  
+- Use standard HTC XML tags (#10)  
+- Work around IE hang on unload when the JScript portion is greater than 512 bytes  
+- Added unit tests, grunt build process  
+- Misc fixes and code cleanup
+
+### 0.1.0 (2012-11-23)
+
+- Initial release

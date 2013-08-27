@@ -1,0 +1,10 @@
+</script>
+
+<!--
+Work around IE sillyness, see:
+http://www.pcreview.co.uk/forums/htc-components-512-bytes-javascript-slow-unload-t727396.html
+https://github.com/lojjic/PIE/blob/master/sources/htc_markup.htc
+https://code.google.com/p/svgweb/source/browse/trunk/src/svg.htc
+-->
+<script type="text/vbscript"></script>
+</PUBLIC:COMPONENT>

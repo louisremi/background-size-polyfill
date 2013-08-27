@@ -1,13 +1,3 @@
-<!-- background-size-polyfill v0.2.0 | (c) 2012-2013 Louis-Rémi Babé | MIT License -->
-<PUBLIC:COMPONENT lightWeight="true">
-<PUBLIC:ATTACH EVENT="oncontentready" ONEVENT="o.init()" />
-<PUBLIC:ATTACH EVENT="ondocumentready" ONEVENT="o.init()" />
-<PUBLIC:ATTACH EVENT="onpropertychange" ONEVENT="o.handlePropertychange()" />
-<PUBLIC:ATTACH EVENT="ondetach" ONEVENT="o.restore()" />
-<PUBLIC:ATTACH EVENT="onresize" FOR="window" ONEVENT="o.handleResize()" />
-<PUBLIC:EVENT NAME="onbackgroundupdate" ID="updateEvent" />
-<script type="text/javascript">
-
 var o; // and so it is
 
 (function( element, window ) {
@@ -501,14 +491,3 @@ if ( element.readyState === "complete" ) {
 }
 
 })( element, window );
-
-</script>
-
-<!--
-Work around IE sillyness, see:
-http://www.pcreview.co.uk/forums/htc-components-512-bytes-javascript-slow-unload-t727396.html
-https://github.com/lojjic/PIE/blob/master/sources/htc_markup.htc
-https://code.google.com/p/svgweb/source/browse/trunk/src/svg.htc
--->
-<script type="text/vbscript"></script>
-</PUBLIC:COMPONENT>

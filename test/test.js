@@ -1249,6 +1249,58 @@ asyncTest( "background-image, change class", function() {
 		div.removeClass( "background-image-300x400" );
 	} );
 } );
+asyncTest( "position", function() {
+	expect( 3 );
+
+	var div = $( "#bg" );
+	div.addClass( "background-image-300x400" );
+
+	polyfillReady( function() {
+		var position = div.css( "position" ),
+			newPosition = position === "relative" ? "absolute" : "relative";
+		notEqual( position, "static", "verify position before test" );
+
+		onbackgroundupdate( function() {
+			equal( div.css( "position" ), newPosition, "correct set position" );
+
+			onbackgroundupdate( function() {
+				notEqual( div.css( "position" ), "static", "correct non-static position" );
+
+				start();
+			} );
+
+			div.css( "position", "static" );
+		} );
+
+		div.css( "position", newPosition );
+	} );
+} );
+asyncTest( "z-index", function() {
+	expect( 3 );
+
+	var div = $( "#bg" );
+	div.addClass( "background-image-300x400" );
+
+	polyfillReady( function() {
+		var zIndex = div.css( "z-index" ),
+			newZIndex = zIndex === 1 ? 2 : 1;
+		notEqual( zIndex, "auto", "verify z-index before test" );
+
+		onbackgroundupdate( function() {
+			equal( div.css( "z-index" ), newZIndex, "correct set z-index" );
+
+			onbackgroundupdate( function() {
+				notEqual( div.css( "z-index" ), "auto", "correct non-auto z-index" );
+
+				start();
+			} );
+
+			div.css( "z-index", "auto" );
+		} );
+
+		div.css( "z-index", newZIndex );
+	} );
+} );
 
 
 

@@ -1260,19 +1260,13 @@ asyncTest( "position", function() {
 			newPosition = position === "relative" ? "absolute" : "relative";
 		notEqual( position, "static", "verify position before test" );
 
-		onbackgroundupdate( function() {
-			equal( div.css( "position" ), newPosition, "correct set position" );
-
-			onbackgroundupdate( function() {
-				notEqual( div.css( "position" ), "static", "correct non-static position" );
-
-				start();
-			} );
-
-			div.css( "position", "static" );
-		} );
-
 		div.css( "position", newPosition );
+		equal( div.css( "position" ), newPosition, "correct set position" );
+
+		div.css( "position", "static" );
+		notEqual( div.css( "position" ), "static", "correct non-static position" );
+
+		start();
 	} );
 } );
 asyncTest( "z-index", function() {
@@ -1286,19 +1280,13 @@ asyncTest( "z-index", function() {
 			newZIndex = zIndex === 1 ? 2 : 1;
 		notEqual( zIndex, "auto", "verify z-index before test" );
 
-		onbackgroundupdate( function() {
-			equal( div.css( "z-index" ), newZIndex, "correct set z-index" );
-
-			onbackgroundupdate( function() {
-				notEqual( div.css( "z-index" ), "auto", "correct non-auto z-index" );
-
-				start();
-			} );
-
-			div.css( "z-index", "auto" );
-		} );
-
 		div.css( "z-index", newZIndex );
+		equal( div.css( "z-index" ), newZIndex, "correct set z-index" );
+
+		div.css( "z-index", "auto" );
+		notEqual( div.css( "z-index" ), "auto", "correct non-auto z-index" );
+
+		start();
 	} );
 } );
 

@@ -15,10 +15,12 @@ function getUrl( size ) { return "url(" + urls[size].src + "?_=" + Math.random()
 
 function setupCSSClasses() {
 	var def = [ "<style id='customCSSClasses' type='text/css'>" ],
-		size;
+		size, url;
 
 	for ( size in urls ) {
-		def.push( ".background-image-", size, " { background-image: ", getUrl( size ), "; } " );
+		url = getUrl( size );
+		def.push( ".background-image-", size,           " { background-image: ", url,            "; } " );
+		def.push( ".background-image-", size, "-important { background-image: ", url, " !important; } " );
 	}
 
 	$( def.join( "" ) + "</style>" ).appendTo( "head" );
@@ -116,6 +118,17 @@ asyncTest( "teardown", function() {
 
 			start();
 		}, 100 );
+	} );
+} );
+asyncTest( "override !important", function() {
+	expect( 3 );
+	var div = $( "#bg" );
+	div.addClass( "background-image-800x600-important position-static-important z-index-auto-important" );
+	polyfillReady( function() {
+		ok( !isUrl( "800x600", div.css( "background-image" ) ), "element does not have background image" );
+		notEqual( div.css( "position" ), "static", "element does not have position: static" );
+		notEqual( div.css( "z-index" ), "auto", "element does not have z-index: auto" );
+		start();
 	} );
 } );
 

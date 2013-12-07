@@ -475,7 +475,7 @@ asyncTest( "10em 600px", function() {
 		start();
 	} );
 } );
-asyncTest( "25percent 40em", function() {
+asyncTest( "50% 40em", function() {
 	expect( 3 );
 	$( "#bg" ).addClass( "background-size-25percent-40em" );
 	polyfillReady( function() {

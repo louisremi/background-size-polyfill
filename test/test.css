@@ -66,3 +66,9 @@
 	behavior: url(../backgroundsize.htc);
 }
 
+.position-static-important {
+	position: static !important;
+}
+.z-index-auto-important {
+	z-index: auto !important;
+}

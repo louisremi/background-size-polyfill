@@ -15,10 +15,12 @@ function getUrl( size ) { return "url(" + urls[size].src + "?_=" + Math.random()
 
 function setupCSSClasses() {
 	var def = [ "<style id='customCSSClasses' type='text/css'>" ],
-		size;
+		size, url;
 
 	for ( size in urls ) {
-		def.push( ".background-image-", size, " { background-image: ", getUrl( size ), "; } " );
+		url = getUrl( size );
+		def.push( ".background-image-", size,           " { background-image: ", url,            "; } " );
+		def.push( ".background-image-", size, "-important { background-image: ", url, " !important; } " );
 	}
 
 	$( def.join( "" ) + "</style>" ).appendTo( "head" );
@@ -116,6 +118,17 @@ asyncTest( "teardown", function() {
 
 			start();
 		}, 100 );
+	} );
+} );
+asyncTest( "override !important", function() {
+	expect( 3 );
+	var div = $( "#bg" );
+	div.addClass( "background-image-800x600-important position-static-important z-index-auto-important" );
+	polyfillReady( function() {
+		ok( !isUrl( "800x600", div.css( "background-image" ) ), "element does not have background image" );
+		notEqual( div.css( "position" ), "static", "element does not have position: static" );
+		notEqual( div.css( "z-index" ), "auto", "element does not have z-index: auto" );
+		start();
 	} );
 } );
 
@@ -1234,6 +1247,46 @@ asyncTest( "background-image, change class", function() {
 		} );
 
 		div.removeClass( "background-image-300x400" );
+	} );
+} );
+asyncTest( "position", function() {
+	expect( 3 );
+
+	var div = $( "#bg" );
+	div.addClass( "background-image-300x400" );
+
+	polyfillReady( function() {
+		var position = div.css( "position" ),
+			newPosition = position === "relative" ? "absolute" : "relative";
+		notEqual( position, "static", "verify position before test" );
+
+		div.css( "position", newPosition );
+		equal( div.css( "position" ), newPosition, "correct set position" );
+
+		div.css( "position", "static" );
+		notEqual( div.css( "position" ), "static", "correct non-static position" );
+
+		start();
+	} );
+} );
+asyncTest( "z-index", function() {
+	expect( 3 );
+
+	var div = $( "#bg" );
+	div.addClass( "background-image-300x400" );
+
+	polyfillReady( function() {
+		var zIndex = div.css( "z-index" ),
+			newZIndex = zIndex === 1 ? 2 : 1;
+		notEqual( zIndex, "auto", "verify z-index before test" );
+
+		div.css( "z-index", newZIndex );
+		equal( div.css( "z-index" ), newZIndex, "correct set z-index" );
+
+		div.css( "z-index", "auto" );
+		notEqual( div.css( "z-index" ), "auto", "correct non-auto z-index" );
+
+		start();
 	} );
 } );
 

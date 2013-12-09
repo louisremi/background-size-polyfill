@@ -70,6 +70,11 @@ Send me music http://www.amazon.co.uk/wishlist/HNTU0468LQON
 Changelog
 ---------
 
+###  ()
+- Added support for:  
+  - Overriding site styles set with `!important` (#35)  
+  - Dynamic changes to `position` and `z-index`
+
 ### 0.2.0 (2013-08-27)
 
 - Added support for:  

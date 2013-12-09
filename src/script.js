@@ -7,6 +7,7 @@ var rsrc = /url\(["']?(.*?)["']?\)/,
 	rpostspace = /\s\s*$/,
 	rmidspace = /\s\s*/g,
 	rpercent = /%$/,
+	rruntimestyles = /(^|;)\s*(background-image|position|z-index):[^;]*/gi, // this could be better
 	positions = {
 		top: 0,
 		left: 0,
@@ -15,7 +16,6 @@ var rsrc = /url\(["']?(.*?)["']?\)/,
 		center: 0.5
 	},
 	doc = element.document,
-	spacer = "data:image/gif;base64,R0lGODlhAQABAIABAP///wAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==",
 	wrapperClass = "background-size-polyfill",
 	noop = function() {},
 	resizeInterval = 100,
@@ -29,23 +29,13 @@ function init() {
 	var wrapper = doc.createElement( "div" ),
 		img = doc.createElement( "img" ),
 		wrapperStyle = wrapper.style,
-		elementStyle = element.style,
-		elementCurrentStyle = element.currentStyle,
 		expando = element.bgsExpando,
 		cloneWrapper = element.firstChild;
 
-	if ( expando ) {
-		if ( expando.restore ) {
-			elementStyle.backgroundImage = expando.restore.backgroundImage;
-			elementStyle.position = expando.restore.position;
-			elementStyle.zIndex = expando.restore.zIndex;
-		}
-
-		if ( cloneWrapper &&
-				( cloneWrapper.nodeName || "" ).toUpperCase() === "DIV" &&
-				cloneWrapper.className === wrapperClass) {
-			element.removeChild( cloneWrapper );
-		}
+	if ( expando && cloneWrapper &&
+			( cloneWrapper.nodeName || "" ).toUpperCase() === "DIV" &&
+			cloneWrapper.className === wrapperClass) {
+		element.removeChild( cloneWrapper );
 	}
 
 	setStyles( wrapper );
@@ -67,12 +57,6 @@ function init() {
 	element.bgsExpando = expando = {
 		wrapper: wrapper,
 		img: img,
-		// styles to restore on detach
-		restore: {
-			backgroundImage: elementStyle.backgroundImage,
-			position: elementStyle.position,
-			zIndex: elementStyle.zIndex
-		},
 		current: {},       // current snapshot
 		next: null,        // next snapshot to process
 		processing: false, // whether we are in the middle of processing the next snapshot
@@ -85,15 +69,6 @@ function init() {
 	};
 
 	wrapperStyle.position = "absolute";
-
-	// This is the part where we mess with the existing DOM
-	// to make sure that the background image is correctly zIndexed
-	if ( elementCurrentStyle.zIndex === "auto" ) {
-		elementStyle.zIndex = 0;
-	}
-	if ( elementCurrentStyle.position === "static" ) {
-		elementStyle.position = "relative";
-	}
 
 	o = {
 		init: noop, // allow init() to be called only once
@@ -181,10 +156,9 @@ function refreshDisplay( element, expando ) {
 	return display !== "none";
 }
 
-function takeSnapshot( element, expando ) {
-	var elementStyle = element.style,
-		elementCurrentStyle = element.currentStyle,
-		expandoRestore = expando.restore,
+function takeSnapshot( element ) {
+	var elementCurrentStyle = element.currentStyle,
+		elementRuntimeStyle = element.runtimeStyle,
 		size = normalizeCSSValue( elementCurrentStyle["background-size"] ),
 		sizeList = size.split( " " ),
 		snapshot = {
@@ -204,7 +178,9 @@ function takeSnapshot( element, expando ) {
 			src: "",
 			imgWidth: 0,
 			imgHeight: 0
-		};
+		},
+		important = " !important",
+		runtimeCSSText;
 
 	// length / percentage size
 	if ( !snapshot.sizeIsKeyword ) {
@@ -231,22 +207,25 @@ function takeSnapshot( element, expando ) {
 		snapshot.posY = positions[ snapshot.posY ] || parseFloat( snapshot.posY ) / 100 || 0;
 	}
 
-	// image
-	if ( ( rsrc.exec( elementStyle.backgroundImage ) || [] )[1] === spacer ) {
-		// inline style wasn't set, but a class change could change the background image
-		// so restore the previous inline style before measuring
-		suspendPropertychange( function() {
-			elementStyle.backgroundImage = expandoRestore.backgroundImage;
-		} );
-	} else {
-		// inline style was set, so save it in our restore list
-		expandoRestore.backgroundImage = elementStyle.backgroundImage;
-	}
-	snapshot.src = ( rsrc.exec( elementCurrentStyle.backgroundImage ) || [] )[1];
-	// set inline background image to the transparent spacer gif
-	// this allows JavaScript to later set it to "none"
+	// image (and position / z-index)
+	// undo our changes before measuring
 	suspendPropertychange( function() {
-		elementStyle.backgroundImage = "url(" + spacer + ")";
+		elementRuntimeStyle.cssText = elementRuntimeStyle.cssText.replace( rruntimestyles, "" );
+	} );
+	snapshot.src = ( rsrc.exec( elementCurrentStyle.backgroundImage ) || [] )[1];
+
+	runtimeCSSText = [ elementRuntimeStyle.cssText, "background-image: none" + important ];
+	// This is the part where we mess with the existing DOM
+	// to make sure that the background image is correctly zIndexed
+	if ( elementCurrentStyle.zIndex === "auto" ) {
+		runtimeCSSText.push( "z-index: 0" + important );
+	}
+	if ( elementCurrentStyle.position === "static" ) {
+		runtimeCSSText.push( "position: relative" + important );
+	}
+	suspendPropertychange( function() {
+		// setting cssText allows us to set styles with "!important"
+		elementRuntimeStyle.cssText = runtimeCSSText.join( ";" );
 	} );
 
 	return snapshot;
@@ -423,7 +402,7 @@ function handlePropertychange() {
 	if ( refreshDisplay( element, expando ) ) {
 		// since each snapshot includes changes all previous snapshots,
 		// we can replace the old next snapshot with a new one
-		expando.next = takeSnapshot( element, expando );
+		expando.next = takeSnapshot( element );
 		processSnapshot( element, expando );
 	}
 }
@@ -434,10 +413,9 @@ function handleResize() {
 }
 
 function restore() {
-	var expando = element.bgsExpando,
-		loadImg,
-		elementStyle,
-		expandoRestore;
+	var elementRuntimeStyle = element.runtimeStyle,
+		expando = element.bgsExpando,
+		loadImg;
 
 	o = {
 		init: noop,
@@ -452,19 +430,16 @@ function restore() {
 	window.clearTimeout( updateBackgroundCallbackId );
 
 	try {
+		if ( elementRuntimeStyle ) {
+			// should we save and restore runtime styles here?
+			elementRuntimeStyle.cssText = elementRuntimeStyle.cssText.replace( rruntimestyles, "" );
+		}
+
 		if ( expando ) {
 			loadImg = expando.loadImg;
 			if ( loadImg ) {
 				loadImg.onload = loadImg.onerror = null;
 				window.clearTimeout( loadImg.callbackId );
-			}
-
-			elementStyle = element.style;
-			expandoRestore = expando.restore;
-			if ( elementStyle ) {
-				elementStyle.backgroundImage = expandoRestore.backgroundImage;
-				elementStyle.position = expandoRestore.position;
-				elementStyle.zIndex = expandoRestore.zIndex;
 			}
 
 			element.removeChild( expando.wrapper );

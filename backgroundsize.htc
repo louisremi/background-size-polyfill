@@ -235,10 +235,10 @@ function takeSnapshot( element, expando ) {
 
 	// keyword / percentage positions
 	if ( snapshot.posX in positions || rpercent.test( snapshot.posX ) ) {
-		snapshot.posX = positions[ snapshot.posX ] || parseFloat( snapshot.posX ) / 100 || 0;
+		snapshot.posX = positions[ snapshot.posX ] || element.clientWidth * (parseFloat( snapshot.posX ) / 100) + "px" || 0;
 	}
 	if ( snapshot.posY in positions || rpercent.test( snapshot.posY ) ) {
-		snapshot.posY = positions[ snapshot.posY ] || parseFloat( snapshot.posY ) / 100 || 0;
+		snapshot.posY = positions[ snapshot.posY ] || element.clientHeight * (parseFloat( snapshot.posY ) / 100) + "px" || 0;
 	}
 
 	// image

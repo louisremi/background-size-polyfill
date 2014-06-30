@@ -337,7 +337,7 @@ function updateBackground( element, expando, snapshot, callback ) {
 		elemRatio,
 		imgRatio;
 
-	if ( innerWidth && innerHeight && imgWidth && imgHeight ) {
+	if ( innerWidth !== undefined && innerHeight !== undefined && imgWidth !== undefined && imgHeight !== undefined ) {
 		expando.wrapper.style.position =
 			snapshot.attachment === "fixed" && expando.canFixed ?
 			"fixed" : "absolute";
